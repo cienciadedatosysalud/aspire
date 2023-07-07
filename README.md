@@ -1,2 +1,4 @@
-# ASPIRE
-ASPIRE (Analytic Software Pipeline Interface for Reproducible Execution):
+# Analytic Software Pipeline Interface for Reproducible Execution (ASPIRE)
+
+
+
