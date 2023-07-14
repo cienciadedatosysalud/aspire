@@ -1,0 +1,8 @@
+**/.idea
+api_aspire/venv
+gui_aspire/projects/*
+gui_aspire/.svelte-kit
+gui_aspire/node_modules
+.git**
+Dockerfile
+docker-compose.yml

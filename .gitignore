@@ -1,0 +1,8 @@
+**/.idea
+api_aspire/venv
+api_aspire/projects/*
+api_aspire/static
+gui_aspire/.svelte-kit
+gui_aspire/node_modules
+gui_aspire/front
+projects/*
