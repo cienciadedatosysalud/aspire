@@ -13,7 +13,6 @@
 	} from "./store";
 	import {
 		Button,
-		NativeSelect,
 		Space,
 		Divider,
 		Notification,
@@ -25,6 +24,8 @@
 	import { Check, Cross2 } from "radix-icons-svelte";
 
 	import DataTable, { Head, Body, Row, Cell } from "@smui/data-table";
+
+	import {Select} from "flowbite-svelte";
 
 	/**
 	 * @type {String}
@@ -60,8 +61,8 @@
 	});
 
 	/**
-	 * @type {String[]}
-	 */
+     * @type {any}
+     */
 	let listFilesProject;
 
 	async function filterScripts() {
@@ -77,7 +78,9 @@
 		let listFilesProject_ = $listFiles.filter(function (item) {
 			return item.uuid == key;
 		});
-		listFilesProject = listFilesProject_[0].files;
+		const listFilesProject_2 = listFilesProject_[0].files;
+		listFilesProject = listFilesProject_2.map((x) => ({value:x, 
+        name:x}));
 	}
 
 	async function runAnalysis() {
@@ -86,13 +89,13 @@
 		const res = await fetch(
 			`/api/analysis/${ProjectInfoSelected}/${ScriptSelected}`
 		);
-		const text = await res.json();
+		const res_json = await res.json();
 		status_promise.set(false);
 		if (res.ok) {
 			newNotification.set(true);
-			return text["output"];
+			return res_json["output"];
 		} else {
-			throw new Error(text["output"]);
+			throw new Error(res_json["detail"]);
 		}
 	}
 
@@ -110,13 +113,16 @@
 </svelte:head>
 
 <h1>Run analysis</h1>
+<Space h="xl" />
 <p>
 	Select the project you want to participate in and launch the analyses provided by the project coordinators. Analyses scripts are open source and can be audited by anyone.
 </p>
+<Space h="xl" />
 <Divider label="Projects" labelPosition="center" size="md" />
-<NativeSelect
+<Space h="xl" />
+<Select
 	bind:value={selectedProject}
-	data={$listProjects}
+	items={$listProjects}
 	placeholder="Select one project"
 	label="Select a project to run its analysis"
 	on:change={() => filterScripts()}
@@ -153,9 +159,10 @@
 
 <Space h="xl" />
 <Divider label="Scripts" labelPosition="center" size="md" />
-<NativeSelect
+<Space h="xl" />
+<Select
 	bind:value={selectedScript}
-	data={listFilesProject}
+	items={listFilesProject}
 	placeholder="Select one script"
 	label="Select the main script to run."
 	on:change={() => (ScriptSelected = selectedScript)}

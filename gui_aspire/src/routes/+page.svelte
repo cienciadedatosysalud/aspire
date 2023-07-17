@@ -1,5 +1,6 @@
 <script>
 	import mainlogo from "$lib/images/main_logo.png";
+	import eulogo from "$lib/images/eu_flag.jpg";
 	import {
 		Center,
 		Text,
@@ -9,7 +10,13 @@
 	} from "@svelteuidev/core";
 	import { typewriter } from "@svelteuidev/motion";
 	import { onMount } from "svelte";
-
+	import {
+		Footer,
+		FooterBrand,
+		FooterCopyright,
+		FooterLink,
+		FooterLinkGroup,
+	} from "flowbite-svelte";
 	let text = "Deploy, Check and Run";
 	let visible = false;
 	
@@ -78,7 +85,22 @@
 		</Timeline.Item>
 	</Timeline>
 </Center>
-
+<Footer class="absolute bottom-0 left-0 z-20 w-full">
+	<div style="width: 325px;">
+	<FooterBrand  src={eulogo} style= "float:left"/>
+	<FooterCopyright href="/" by="Atlas VPM" year={2023} /></div>
+	<FooterLinkGroup
+		ulClass="flex flex-wrap items-center mt-3 text-sm text-gray-500 dark:text-gray-400 sm:mt-0"
+	>
+		<FooterLink href="/about">About</FooterLink>
+		<FooterLink href="/about#authors">Author(s)</FooterLink>
+		<FooterLink href="/about#funding">Funding</FooterLink>
+		<FooterLink href="/about#termsconditions">Terms&Conditions</FooterLink>
+		<FooterLink href="https://cienciadedatosysalud.org/en/contact/"
+			>Contact</FooterLink
+		>
+	</FooterLinkGroup>
+</Footer>
 <style>
 	section {
 		display: flex;

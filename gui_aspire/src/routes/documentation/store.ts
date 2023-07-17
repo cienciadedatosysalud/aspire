@@ -1,10 +1,5 @@
 import { writable, derived } from 'svelte/store';
 
-/** Store for your data. 
-This assumes the data you're pulling back will be an array.
-If it's going to be an object, default this to an empty object.
-**/
-
 interface CohortInfo {
     name: string;
     inclusion_criteria: string;
@@ -38,7 +33,7 @@ interface MetadataInfo {
     work_package: string;
 }
 
- interface DataInfo {
+export interface DataInfo {
     cohort: CohortInfo;
     metadata: MetadataInfo;
   }
@@ -49,26 +44,13 @@ export interface ProjectInfo {
     data: DataInfo;
   }
 
-
-//let ResponseArray:ProjectInfo[] = []
 export const apiData = writable([]);
-
-/** Data transformation.
-For our use case, we only care about the drink names, not the other information.
-Here, we'll create a derived store to hold the drink names.
-**/
-/**export const drinkNames = derived(apiData, ($apiData) => {
-  if ($apiData.drinks){
-    return $apiData.drinks.map(drink => drink.strDrink);
-  }
-  return [];
-});*/
 
 export const listProjects = derived(apiData, ($apiData) => {
     const response:ProjectInfo[] = $apiData.projects
     if (response){
-        return response.map(project => project.data.metadata.project + ' - ' +project.data.metadata.use_case);
-        //return ["gola"]
+      return response.map(x => ({value:x.data.metadata.project + ' - ' +x.data.metadata.use_case, 
+      name:x.data.metadata.project + ' - ' +x.data.metadata.use_case}));
     }
     return [];
   });
@@ -77,9 +59,6 @@ export const ProjectsInfo = derived(apiData, ($apiData) => {
     const response:ProjectInfo[] = $apiData.projects
     if (response){
         return Object.assign({}, ...response.map((x) => ({[x.data.metadata.project + ' - ' +x.data.metadata.use_case]: x})));
-        
-        //response.map(project => project.data.metadata.project + ' - ' +project.data.metadata.use_case);
-        //return ["gola"]
     }
     return {};
   });

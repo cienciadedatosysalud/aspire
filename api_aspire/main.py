@@ -1,7 +1,7 @@
 import hashlib
 from typing import List
 import uvicorn
-from fastapi import FastAPI, UploadFile, Request
+from fastapi import FastAPI, HTTPException, UploadFile, Request
 from fastapi.middleware.cors import CORSMiddleware
 import glob
 import json
@@ -179,7 +179,7 @@ def launch_dqa(project_id: str):
     dqa_path = os.path.join(path, 'src', 'dqa-scripts', 'dqa.py')
     isExisting = os.path.exists(dqa_path)
     if not isExisting:
-        raise FileNotFoundError('Cannot find dqa.py in your project')
+        raise HTTPException(status_code=400, detail='Cannot find dqa.py in your project')
     output_path = os.path.join(path, 'outputs', 'logs')
     if not os.path.exists(output_path):
         os.makedirs(output_path)
@@ -206,7 +206,7 @@ def launch_checking(project_id: str):
     checking_path = os.path.join(path, 'src', 'check_load-scripts', 'check_load.py')
     isExisting = os.path.exists(checking_path)
     if not isExisting:
-        raise FileNotFoundError('Cannot find check_load.py in your project')
+        raise HTTPException(status_code=400, detail='Cannot find check_load.py in your project')
     output_path = os.path.join(path, 'outputs', 'logs')
     if not os.path.exists(output_path):
         os.makedirs(output_path)
@@ -238,7 +238,7 @@ def launch_validator(project_id: str):
     validator_path = os.path.join(path, 'src', 'validation-scripts', 'validator.py')
     isExisting = os.path.exists(validator_path)
     if not isExisting:
-        raise FileNotFoundError('Cannot find validator.py in your project')
+        raise HTTPException(status_code=400, detail='Cannot find validator.py in your project')
     output_path = os.path.join(path, 'outputs', 'logs')
     if not os.path.exists(output_path):
         os.makedirs(output_path)
@@ -258,7 +258,7 @@ def launch_validator(project_id: str):
         validator_report_path = os.path.join(path, 'src', 'validation-scripts', 'validator_report.qmd')
         isExisting = os.path.exists(validator_report_path)
         if not isExisting:
-            raise FileNotFoundError('Cannot find validator_report.qmd in your project')
+            raise HTTPException(status_code=400, detail='Cannot find validator_report.qmd in your project')
         process_report = subprocess.Popen(["quarto", "render", validator_report_path, "--output-dir", "../../outputs"],
                                         stdout=subprocess.PIPE, stderr=subprocess.STDOUT, universal_newlines=True)
         output_report, error = process_report.communicate()
@@ -272,6 +272,8 @@ def launch_validator(project_id: str):
         output += "\n Launching report: \n\n"
         output += output_report
     get_hashed_files_list(ts_script, path,'validator')
+    if process.returncode != 0:
+        raise HTTPException(status_code=400, detail=output)
     return {"status_code": process.returncode, "output": output}
 
 
@@ -285,7 +287,7 @@ def launch_analysis(project_id: str, script_name: str):
         os.makedirs(output_path)
     isExisting = os.path.exists(script_path)
     if not isExisting:
-        raise FileNotFoundError('Cannot find ' + script_name + ' in your project')
+        raise HTTPException(status_code=400, detail='Cannot find ' + script_name + ' in your project')
 
     file_name, file_extension = os.path.splitext(script_path)
     file_extension = file_extension.upper()
@@ -302,7 +304,8 @@ def launch_analysis(project_id: str, script_name: str):
         with open(os.path.join(output_path, 'analysis_execution.log'), 'w') as f:
             f.write(output)
         get_hashed_files_list(ts_script, path,'analysis')
-
+        if process.returncode != 0:
+            raise HTTPException(status_code=400, detail=output)
         return {"status_code": process.returncode, "output": output}
     elif file_extension == ".PY":
         ts_script = time.time()
@@ -317,6 +320,8 @@ def launch_analysis(project_id: str, script_name: str):
         with open(os.path.join(output_path, 'analysis_execution.log'), 'w') as f:
             f.write(output)
         get_hashed_files_list(ts_script, path,'analysis')
+        if process.returncode != 0:
+            raise HTTPException(status_code=400, detail=output)
         return {"status_code": process.returncode, "output": output}
     elif file_extension == ".QMD":
         ts_script = time.time()
@@ -338,9 +343,11 @@ def launch_analysis(project_id: str, script_name: str):
         with open(os.path.join(output_path, 'analysis_execution.log'), 'w') as f:
             f.write(output)
         get_hashed_files_list(ts_script, path,'analysis')
+        if process.returncode != 0:
+            raise HTTPException(status_code=400, detail=output)
         return {"status_code": process.returncode, "output": output}
     else:
-        raise FileExistsError("Script with invalid extension. Only .py, .R , .qmd (Python or R) are supported.")
+        raise HTTPException(status_code=400, detail="Script with invalid extension. Only .py, .R , .qmd (Python or R) are supported.")
 
 
 # Launch analysis
@@ -369,7 +376,7 @@ def download_file(project_id: str, filename: str):
     file_path = os.path.join(path_, "outputs", filename)
     if os.path.exists(file_path):
         return FileResponse(path=file_path, filename=filename)
-    raise FileNotFoundError
+    raise HTTPException(status_code=400, detail=f'Cannot find {filename} file in your project')
 
 
 # Download datamodel documentation
@@ -415,6 +422,7 @@ async def create_upload_file(files: List[UploadFile], project_id: str):
             output += "\n"
             output += f"{upload_file.filename} - {str(e)}"
             output += "\n"
+            raise HTTPException(status_code=400, detail=output)
         finally:
             upload_file.file.close()
     with open(os.path.join(output_path, 'mapping_input_files.log'), 'w') as f:
@@ -437,7 +445,7 @@ async def delete_outputs_files(project_id: str):
             output += "\n"
             output += f"{file} - {str(e)}"
             output += "\n"
-            pass
+            raise HTTPException(status_code=400, detail=output)
     return {"status_code": status, "output": output}
 
 

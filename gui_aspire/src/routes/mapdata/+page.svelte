@@ -25,7 +25,6 @@
 		Button,
 		Text,
 		Timeline,
-		NativeSelect,
 		Space,
 		Notification,
 		Divider,
@@ -35,7 +34,7 @@
 
 	import { Check, Cross2 } from "radix-icons-svelte";
 	import DataTable, { Head, Body, Row, Cell } from "@smui/data-table";
-
+	import {Select} from "flowbite-svelte";
 	/**
 	 * @type {String}
 	 */
@@ -49,6 +48,7 @@
 	onMount(async () => {
 		if (!$running_analysis) {
 			previous_analysis.set(false);
+			status_fails.set(false)
 			step_running.set(-1);
 			beggining_datetime.set(new Date());
 			map_datetime.set(new Date());
@@ -62,6 +62,7 @@
 	});
 
 	async function mapData() {
+		
 		beggining_datetime.set(new Date());
 		const formData = new FormData();
 		for (const file of files) {
@@ -74,13 +75,13 @@
 		const res_json = await res.json();
 
 		map_datetime.set(new Date());
-		if (res_json["status_code"] == 0) {
+		if (res.status == 200) {
 			step_running.set(0);
 			return res_json["output"];
 		} else {
 			status_fails.set(true);
 			running_analysis.set(false);
-			throw new Error(res_json["output"]);
+			throw new Error(res_json["detail"]);
 		}
 	}
 
@@ -90,13 +91,14 @@
 
 		checking_datetime.set(new Date());
 		dqa_datetime.set(new Date());
-		if (res_json["status_code"] == 0) {
+		
+		if (res.status == 200) {
 			step_running.set(1);
 			return res_json["output"];
 		} else {
 			status_fails.set(true);
 			running_analysis.set(false);
-			throw new Error(res_json["output"]);
+			throw new Error(res_json["detail"]);
 		}
 	}
 
@@ -105,13 +107,13 @@
 
 		const res_json = await res.json();
 		dqa_datetime.set(new Date());
-		if (res_json["status_code"] == 0) {
+		if (res.status == 200) {
 			step_running.set(2);
 			return res_json["output"];
 		} else {
 			status_fails.set(true);
 			running_analysis.set(false);
-			throw new Error(res_json["output"]);
+			throw new Error(res_json["detail"]);
 		}
 	}
 
@@ -119,13 +121,13 @@
 		const res = await fetch(`/api/validator/${ProjectInfoSelected}`);
 		const res_json = await res.json();
 		validator_datetime.set(new Date());
-		if (res_json["status_code"] == 0) {
+		if (res.status == 200) {
 			step_running.set(3);
 			return res_json["output"];
 		} else {
 			status_fails.set(true);
 			running_analysis.set(false);
-			throw new Error(res_json["output"]);
+			throw new Error(res_json["detail"]);
 		}
 	}
 
@@ -148,6 +150,7 @@
 	async function upload() {
 		running_analysis.set(true);
 		previous_analysis.set(true);
+		status_fails.set(false)
 		promise_upload_file.set(mapData());
 		await $promise_upload_file;
 		newNotification.set(true);
@@ -183,17 +186,17 @@
 </svelte:head>
 
 <h1>Map your data</h1>
-
+<Space h="xl" />
 <p>
 	Select the project you want to participate in and introduce your data for
 	analysis. Data should be extracted from your health information systems
 	following the requirements and specifications of the data model of the use
 	case in which you want to participate.
 </p>
-
-<NativeSelect
+<Space h="xl" />
+<Select
 	bind:value={selectedOption}
-	data={$listProjects}
+	items={$listProjects}
 	placeholder="Select one project"
 	label="Select a project"
 	on:change={() => (ProjectInfoSelected = $ProjectsInfo[selectedOption]["uuid"])}

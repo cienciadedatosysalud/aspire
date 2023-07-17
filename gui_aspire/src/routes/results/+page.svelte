@@ -2,7 +2,6 @@
 	import { onDestroy, onMount } from "svelte";
 	import {
 		Button,
-		NativeSelect,
 		Divider,
 		Space,
 		Center,
@@ -17,6 +16,7 @@
 	} from "./store";
 	import { File } from "radix-icons-svelte";
 	import DataTable, { Head, Body, Row, Cell } from "@smui/data-table";
+	import {Select} from "flowbite-svelte";
 	/**
 	 * @type {String}
 	 */
@@ -28,7 +28,7 @@
 		const data = await response.json();
 		apiData.set(data);
 	});
-
+	
 
 	/**
 	 * @type {any}
@@ -156,6 +156,7 @@
 </svelte:head>
 
 <h1>Outputs</h1>
+<Space h="xl" />
 <p>
 	Retrieve your outputs once the analyses have run successfully. Outputs from
 	the analysis may include interactive reports (in HTML format), the DQA
@@ -163,10 +164,12 @@
 	share for the federated analysis for each use case.
 </p>
 <p>(If you cannot select a project, it means that no output files have been found for any of the loaded projects.)</p>
+<Space h="xl" />
 <Divider label="List of projects" labelPosition="center" size="md" />
-<NativeSelect
+<Space h="xl" />
+<Select
 	bind:value={selectedOption}
-	data={$listProjects}
+	items={$listProjects}
 	placeholder="Select one project"
 	label="Select a project to view its result files"
 	on:change={() => projectChange($ProjectsInfo[selectedOption]["uuid"])}

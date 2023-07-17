@@ -1,7 +1,8 @@
 <script>
 	import { onMount } from "svelte";
 	import { apiData, listProjects, ProjectsInfo } from "./store";
-	import { NativeSelect, Space, Text, Divider, Button } from "@svelteuidev/core";
+	import {Space, Text, Divider, Button } from "@svelteuidev/core";
+	import {Select} from "flowbite-svelte";
 	import.meta.env.MODE;
 	/**
 	 * @type {String}
@@ -42,14 +43,15 @@
 </svelte:head>
 
 <h1>Documentation</h1>
+<Space h="xl" />
 <p>
 	In this page you can see the documentation of all the projects that are loaded
 	in the application.
 </p>
-
-<NativeSelect
+<Space h="xl" />
+<Select
 	bind:value={selectedOption}
-	data={$listProjects}
+	items={$listProjects}
 	placeholder="Select one project"
 	label="Select a project to view its information"
 	on:change={() => (ProjectInfoSelected = $ProjectsInfo[selectedOption])}
@@ -81,6 +83,7 @@
 	<p>
 		<strong>Name: </strong>{ProjectInfoSelected.data.cohort.name}
 	</p>
+	<Space h="xs" />
 	<div style="display: flex">
 		<Text
 			><strong>Beggining study period: </strong>{ProjectInfoSelected.data
@@ -92,6 +95,7 @@
 				.end_study_period}</Text
 		>
 	</div>
+	<Space h="xs" />
 	<p>
 		<strong>Inclusion criteria: </strong>{ProjectInfoSelected.data.cohort
 			.inclusion_criteria}

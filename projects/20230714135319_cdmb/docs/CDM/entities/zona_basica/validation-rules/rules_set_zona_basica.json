@@ -1,0 +1,25 @@
+{
+    "description": "The expressions of the different rules follow the syntax of the SQL OLAP database \n        management system called DuckDB. For more information, visit https://duckdb.org/docs/sql/introduction. \n        Keep in mind that you only have to declare as a rule the statement that would follow a WHERE clause. \n        e.g.,  Select * from people WHERE {expression}\n        expression = age >= 18\n        ",
+    "rules": [
+        {
+            "expression": "año_cd BETWEEN 2013 AND 2022",
+            "name": "año_cd",
+            "description": "Rule for column año_cd"
+        },
+        {
+            "expression": "grupo_edad_cd BETWEEN 1 AND 18",
+            "name": "grupo_edad_cd",
+            "description": "Rule for column grupo_edad_cd"
+        },
+        {
+            "expression": "sexo_cd IN ('0', '1', '2', '9')",
+            "name": "sexo_cd",
+            "description": "Rule for column sexo_cd"
+        },
+        {
+            "expression": "tsi_cd IN ('0', '1', '2', '3', '4', '5', '6', '7', '8')",
+            "name": "tsi_cd",
+            "description": "Rule for column tsi_cd"
+        }
+    ]
+}

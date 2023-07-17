@@ -24,7 +24,6 @@
 			<li aria-current={$page.url.pathname === "/" ? "page" : undefined}>
 				<a href="/">Home</a>
 			</li>
-			<hr class="dashed" style="height:30%;"/>
 			<li
 				aria-current={$page.url.pathname === "/mapdata"
 					? "page"
