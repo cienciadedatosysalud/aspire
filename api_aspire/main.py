@@ -123,9 +123,13 @@ def get_projects_db(project_id: str):
                 if idx < len(entities) - 1:
                     query = query + "\nunion all \n"
                 idx += 1
-            con = duckdb.connect(database_path, read_only=True)
-            df_count = con.query(query).to_df()
-            result = df_count.to_dict(orient="records")
+            try:
+                con = duckdb.connect(database_path, read_only=True)
+                df_count = con.query(query).to_df()
+                result = df_count.to_dict(orient="records")
+            except Exception:
+                result = [{"entity":"-", "n_registries":"-"}]
+                return result
     return result
 
 
