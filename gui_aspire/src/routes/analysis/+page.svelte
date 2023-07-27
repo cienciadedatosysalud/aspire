@@ -9,7 +9,7 @@
 		promise,
 		status_promise,
 		notification_execution,
-		dbInfo,
+		dbInfo
 	} from "./store";
 	import {
 		Button,
@@ -108,7 +108,8 @@
 </script>
 
 <svelte:head>
-	<title>Analysis</title>
+	{#if !$notification_execution}<title>Analysis</title>{/if}
+	{#if $notification_execution}<title>Running analysis...</title>{/if}
 	<meta name="description" content="Run analysis" />
 </svelte:head>
 

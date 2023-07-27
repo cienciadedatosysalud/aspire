@@ -181,7 +181,7 @@
 
 <svelte:head>
 	{#if !$running_analysis}<title>Map data</title>{/if}
-	{#if $running_analysis}<title>Mapping data ...</title>{/if}
+	{#if $running_analysis}<title>Mapping data...</title>{/if}
 	<meta name="Map your data" content="Map data" />
 </svelte:head>
 

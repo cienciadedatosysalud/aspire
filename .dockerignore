@@ -6,3 +6,4 @@ gui_aspire/node_modules
 .git**
 Dockerfile
 docker-compose.yml
+projects/*

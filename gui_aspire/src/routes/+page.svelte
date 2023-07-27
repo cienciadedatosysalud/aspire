@@ -17,11 +17,20 @@
 		FooterLink,
 		FooterLinkGroup,
 	} from "flowbite-svelte";
-	let text = "Deploy, Check and Run";
+	let text = "Deploy >> Check >> Run";
+	let text_app = "Analytic Software Pipeline Interface for Reproducible Execution"
+	let text_app_short = "ASPIRE"
 	let visible = false;
-	
+	let visible2 = false;
+	let visible3 = false;
 	onMount(async () => {
 		visible = true;
+		visible2 = true
+		setTimeout(() => {
+			visible2 = false 
+			}, 2500);
+		setTimeout(() => {
+			visible3 = true}, 3000);
 	});
 
 	let active = 0
@@ -29,6 +38,8 @@
 	setInterval(() => {
 		active = (active + 1) % 3
 	}, 1500);
+
+	import { blur } from 'svelte/transition';
 </script>
 
 <svelte:head>
@@ -51,6 +62,13 @@
 		</span>
 		{#if visible}
 			<p in:typewriter={{ speed: 2 }}>{text}</p>
+			
+		{/if}
+		{#if visible2}
+			<p style="font-size: 30px;" in:blur={{duration: 500}} out:blur={{duration: 500}}>{text_app}</p>
+		{/if}
+		{#if visible3}
+			<p in:blur={{delay: 0, duration: 1000}}>{text_app_short}</p>
 		{/if}
 	</h1>
 </section>
