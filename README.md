@@ -74,5 +74,5 @@ and ![orcid](https://orcid.org/sites/default/files/images/orcid_16x16.png) [Sant
 # References
 - Common Data Model Builder: https://github.com/cienciadedatosysalud/cdmb
 
-
+[![DOI](https://zenodo.org/badge/663471048.svg)](https://zenodo.org/badge/latestdoi/663471048)
 <a href="hhttps://creativecommons.org/licenses/by-nc/4.0/" target="_blank" ><img src="https://img.shields.io/badge/license-CC--BY--NC%204.0-lightgrey" alt="License: CC-BY-NC 4.0"></a>
