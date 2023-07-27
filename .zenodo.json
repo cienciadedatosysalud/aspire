@@ -1,0 +1,43 @@
+{
+    "description": "<p><strong>ASPIRE (Analytic Software Pipeline Interface for Reproducible Execution)</strong></p>\n\n<p>ASPIRE is a tool that allows you to containerize real life data analysis pipelines developed in Python or R in a simple, standardized and transparent way to enable reproducibility and ease of deployment in a federated approach. These projects follow the structure build using the&nbsp;<a href=\"https://github.com/cienciadedatosysalud/cdmb\">Common Data Model Builder</a>, a tool that allows you to create common data models to facilitate interoperability and reproducibility of the analyses.</p>", 
+    "license": "CC-BY-NC-4.0", 
+    "title": "ASPIRE (Analytic Software Pipeline Interface for Reproducible Execution)", 
+    "version": "1.1.2", 
+    "upload_type": "software", 
+    "publication_date": "2023-07-27", 
+    "creators": [
+        {
+            "orcid": "0000-0002-8783-5478", 
+            "affiliation": "Instituto Aragon\u00e9s de Ciencias de la Salud", 
+            "name": "Gonz\u00e1lez-Galindo, Javier"
+        }, 
+        {
+            "orcid": "0000-0002-6285-8120", 
+            "affiliation": "Instituto Aragon\u00e9s de Ciencias de la Salud", 
+            "name": "Estupi\u00f1an-Romero, Francisco"
+        }, 
+        {
+            "orcid": "0000-0002-0048-4370", 
+            "affiliation": "Instituto Aragon\u00e9s de Ciencias de la Salud", 
+            "name": "Royo-Sierra, Santiago"
+        }, 
+        {
+            "orcid": "0000-0002-0961-3298", 
+            "affiliation": "Instituto Aragon\u00e9s de Ciencias de la Salud", 
+            "name": "Bernal-Delgado, Enrique"
+        }
+    ], 
+    "access_right": "open", 
+    "related_identifiers": [
+        {
+            "scheme": "url", 
+            "identifier": "https://github.com/cienciadedatosysalud/aspire/tree/1.1.2", 
+            "relation": "isSupplementTo"
+        }, 
+        {
+            "scheme": "doi", 
+            "identifier": "10.5281/zenodo.8189900", 
+            "relation": "isVersionOf"
+        }
+    ]
+}
