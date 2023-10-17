@@ -102,7 +102,7 @@
     "button_download":"Download documentation",
     "label_metadata":"Metadata",
     "doc_project":"Project:",
-    "":"Use case:",
+    "doc_usecase":"Use case:",
     "doc_funder":"Funder:",
     "doc_description":"Description:",
     "doc_notes":"Notes:",
