@@ -66,6 +66,18 @@ and ![orcid](https://orcid.org/sites/default/files/images/orcid_16x16.png) [Sant
 - Repository: https://github.com/cienciadedatosysalud/ASPIRE/
 - Issue tracker: https://github.com/cienciadedatosysalud/ASPIRE/issues
 
+## Translate ASPIRE to your language
+
+ASPIRE uses [i18n for Svelte](https://github.com/kaisermann/svelte-i18n) for internationalization.
+
+Currently ASPIRE supports English by default and Spanish. Language selection is based on the default language set in your browser.
+
+You can contribute adding another language by downloading the [en.json](https://github.com/cienciadedatosysalud/aspire/blob/main/gui_aspire/src/lib/i18n/locales/en.json) file, modify the json file without changing the value of the keys and changing each value to your language. It is important to respect all punctuation marks and escape characters.
+
+Save the translated .json file as <your_language_code>.json.  "your_language_code" must follow the [ISO 639-1](https://en.wikipedia.org/wiki/List_of_ISO_639-1_codes) standard.
+
+Make a pull request to add your language. 
+
 # Links of interest to manage R and Python dependencies for the analyses
 - Micromamba: https://mamba.readthedocs.io/en/latest/user_guide/micromamba.html
 - Manage Dependencies with the deps R Package: https://hosting.analythium.io/manage-dependencies-with-the-deps-r-package-for-docker-containers/
