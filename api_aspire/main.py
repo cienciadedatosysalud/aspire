@@ -196,11 +196,17 @@ def launch_dqa(project_id: str):
     output = output.replace("\x1b[31m", "")
     output = output.replace("\x1b[1m", "")
     output = output.replace("\x1b[22m", "")
-    with open(os.path.join(output_path, ' data_quality_assesment.log'), 'w') as f:
+
+    log_path = os.path.join(output_path, 'data_quality_assesment.log')
+    isExisting = os.path.exists(log_path)
+    if isExisting:
+        os.remove(log_path)
+    with open(log_path, 'w') as f:
         f.write(output)
 
     get_hashed_files_list(ts_script, path,'dqa')
-    
+    if process.returncode != 0:
+            raise HTTPException(status_code=400, detail=output)
     return {"status_code": process.returncode, "output": output}
 
 
@@ -228,10 +234,15 @@ def launch_checking(project_id: str):
     input_directory = os.path.join(path, 'src', 'check_load-scripts', 'inputs')
     log_files_deletion = delete_input_directory(input_directory)
     output += log_files_deletion
-
-    with open(os.path.join(output_path, 'checking_data_syntax.log'), 'w') as f:
+    log_path = os.path.join(output_path, 'checking_data_syntax.log')
+    isExisting = os.path.exists(log_path)
+    if isExisting:
+        os.remove(log_path)
+    with open(log_path, 'w') as f:
         f.write(output)
     get_hashed_files_list(ts_script, path,'check_load')
+    if process.returncode != 0:
+            raise HTTPException(status_code=400, detail=output)
     return {"status_code": process.returncode, "output": output}
 
 
@@ -255,9 +266,12 @@ def launch_validator(project_id: str):
     output = output.replace("\x1b[31m", "")
     output = output.replace("\x1b[1m", "")
     output = output.replace("\x1b[22m", "")
-    with open(os.path.join(output_path, 'checking_data_compliance.log'), 'w') as f:
+    log_path = os.path.join(output_path, 'checking_data_compliance.log')
+    isExisting = os.path.exists(log_path)
+    if isExisting:
+        os.remove(log_path)
+    with open(log_path, 'w') as f:
         f.write(output)
-    print(error)
     if process.returncode == 0:
         validator_report_path = os.path.join(path, 'src', 'validation-scripts', 'validator_report.qmd')
         isExisting = os.path.exists(validator_report_path)
@@ -271,7 +285,11 @@ def launch_validator(project_id: str):
         output_report = output_report.replace("\x1b[31m", "")
         output_report = output_report.replace("\x1b[1m", "")
         output_report = output_report.replace("\x1b[22m", "")
-        with open(os.path.join(output_path, 'report_validation_report.log'), 'w') as f:
+        log_path = os.path.join(output_path, 'report_validation_report.log')
+        isExisting = os.path.exists(log_path)
+        if isExisting:
+            os.remove(log_path)
+        with open(log_path, 'w') as f:
             f.write(output_report)
         output += "\n Launching report: \n\n"
         output += output_report
@@ -305,7 +323,11 @@ def launch_analysis(project_id: str, script_name: str):
         output = output.replace("\x1b[31m", "")
         output = output.replace("\x1b[1m", "")
         output = output.replace("\x1b[22m", "")
-        with open(os.path.join(output_path, 'analysis_execution.log'), 'w') as f:
+        log_path = os.path.join(output_path, 'analysis_execution.log')
+        isExisting = os.path.exists(log_path)
+        if isExisting:
+            os.remove(log_path)
+        with open(log_path, 'w') as f:
             f.write(output)
         get_hashed_files_list(ts_script, path,'analysis')
         if process.returncode != 0:
@@ -321,7 +343,11 @@ def launch_analysis(project_id: str, script_name: str):
         output = output.replace("\x1b[31m", "")
         output = output.replace("\x1b[1m", "")
         output = output.replace("\x1b[22m", "")
-        with open(os.path.join(output_path, 'analysis_execution.log'), 'w') as f:
+        log_path = os.path.join(output_path, 'analysis_execution.log')
+        isExisting = os.path.exists(log_path)
+        if isExisting:
+            os.remove(log_path)
+        with open(log_path, 'w') as f:
             f.write(output)
         get_hashed_files_list(ts_script, path,'analysis')
         if process.returncode != 0:
@@ -344,7 +370,11 @@ def launch_analysis(project_id: str, script_name: str):
         output = output.replace("\x1b[31m", "")
         output = output.replace("\x1b[1m", "")
         output = output.replace("\x1b[22m", "")
-        with open(os.path.join(output_path, 'analysis_execution.log'), 'w') as f:
+        log_path = os.path.join(output_path, 'analysis_execution.log')
+        isExisting = os.path.exists(log_path)
+        if isExisting:
+            os.remove(log_path)
+        with open(log_path, 'w') as f:
             f.write(output)
         get_hashed_files_list(ts_script, path,'analysis')
         if process.returncode != 0:
@@ -368,6 +398,15 @@ def get_analysis_scripts():
         response["scripts"].append({"uuid": uuid, "files": text_files})
     return response
 
+# Download all files
+@app.get("/api/download/{project_id}")
+def download_all(project_id: str):
+    try:
+        path_ = get_project_path_by_uuid(project_id)
+        outputs_files = list(filter(os.path.isfile,glob.glob(os.path.join(path_ + "/outputs/**"), recursive=True)))
+        return zipfiles(outputs_files)
+    except:
+        raise HTTPException(status_code=400, detail=f'Something went wrong trying to download all the files.')
 
 # Download file
 @app.get("/api/download/{project_id}/{filename}")
@@ -395,8 +434,7 @@ def zipfiles(file_list):
     io = BytesIO()
     with zipfile.ZipFile(io, mode='w', compression=zipfile.ZIP_DEFLATED) as zip:
         for fpath in file_list:
-            zip.write(fpath)
-        # close zip
+            zip.write(fpath,arcname=str(fpath).replace('projects/',''))
         zip.close()
     return StreamingResponse(
         iter([io.getvalue()]),
@@ -429,7 +467,11 @@ async def create_upload_file(files: List[UploadFile], project_id: str):
             raise HTTPException(status_code=400, detail=output)
         finally:
             upload_file.file.close()
-    with open(os.path.join(output_path, 'mapping_input_files.log'), 'w') as f:
+    log_path = os.path.join(output_path, 'mapping_input_files.log')
+    isExisting = os.path.exists(log_path)
+    if isExisting:
+        os.remove(log_path)
+    with open(log_path, 'w') as f:
         f.write(output)
     return {"status_code": status, "output": output}
 

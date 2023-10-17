@@ -6,6 +6,7 @@
 		Space,
 		Center,
 		Modal,
+		SimpleGrid
 	} from "@svelteuidev/core";
 	import {
 		apiData,
@@ -17,6 +18,7 @@
 	import { File } from "radix-icons-svelte";
 	import DataTable, { Head, Body, Row, Cell } from "@smui/data-table";
 	import {Select} from "flowbite-svelte";
+	import { _ } from 'svelte-i18n'
 	/**
 	 * @type {String}
 	 */
@@ -147,6 +149,23 @@
 		deletedModalOpened = false;
 	}
 
+	async function downloadAll(){
+		let project_id = $ProjectsInfo[selectedOption]["uuid"];
+		const filename = `outputs.zip`
+		let res = await fetch(`/api/download/${project_id}`);
+		let blob = await res.blob();
+		var url = window.URL || window.webkitURL;
+		let link = url.createObjectURL(blob);
+		let a = document.createElement("a");
+		a.setAttribute("download", `${filename}`);
+		a.setAttribute("href", link);
+		document.body.appendChild(a);
+		a.click();
+		document.body.removeChild(a);
+
+	}
+
+
 	let deletedModalOpened = false;
 </script>
 
@@ -155,41 +174,38 @@
 	<meta name="Outputs" content="Outputs" />
 </svelte:head>
 
-<h1>Outputs</h1>
+<h1>{$_('outputs.title')}</h1>
 <Space h="xl" />
 <p>
-	Retrieve your outputs once the analyses have run successfully. Outputs from
-	the analysis may include interactive reports (in HTML format), the DQA
-	report of the data analysed (in HTML format) and aggregated data files to
-	share for the federated analysis for each use case.
+	{$_('outputs.explanation1')}
 </p>
-<p>(If you cannot select a project, it means that no output files have been found for any of the loaded projects.)</p>
+<p>{$_('outputs.explanation2')}</p>
 <Space h="xl" />
-<Divider label="List of projects" labelPosition="center" size="md" />
+<Divider label="{$_('outputs.separator_list')}" labelPosition="center" size="md" />
 <Space h="xl" />
 <Select
 	bind:value={selectedOption}
 	items={$listProjects}
-	placeholder="Select one project"
+	placeholder="{$_('outputs.selector_project')}"
 	label="Select a project to view its result files"
 	on:change={() => projectChange($ProjectsInfo[selectedOption]["uuid"])}
 />
 <Space h="xl" />
-<Divider label="Output files" labelPosition="center" size="md" />
+<Divider label="{$_('outputs.separator_outputs')}" labelPosition="center" size="md" />
 {#if selectedOption}
 	{#if listFilesTabHtml.length > 0}
-	<Divider label="HTML files" labelPosition="center" variant="dashed" />
+	<Divider label="{$_('outputs.separator_html')}" labelPosition="center" variant="dashed" />
 	<Center>
 		<DataTable table$aria-label="db info" style="max-width: 100%;">
 			<Head>
 				<Row>
-					<Cell style="text-align: left;">Filename</Cell>
+					<Cell style="text-align: left;">{$_('outputs.filename')}</Cell>
 					<Space w="xl" />
 					<Space w="xl" />
-					<Cell style="text-align: center;">Date</Cell>
+					<Cell style="text-align: center;">{$_('outputs.date')}</Cell>
 					<Space w="xl" />
 					<Space w="xl" />
-					<Cell style="text-align: center;">Action</Cell>
+					<Cell style="text-align: center;">{$_('outputs.action')}</Cell>
 				</Row>
 			</Head>
 			<Body>
@@ -207,7 +223,7 @@
 							<Button
 								variant="outline"
 								on:click={() => downloadFile(item.filename)}
-								><File /> <Space w="xs" /> Download</Button
+								><File /> <Space w="xs" /> {$_('outputs.download')}</Button
 							></Cell
 						>
 					</Row>
@@ -222,13 +238,13 @@
 		<DataTable table$aria-label="db info" style="max-width: 100%;">
 			<Head>
 				<Row>
-					<Cell style="text-align: left;">Filename</Cell>
+					<Cell style="text-align: left;">{$_('outputs.filename')}</Cell>
 					<Space w="xl" />
 					<Space w="xl" />
-					<Cell style="text-align: center;">Date</Cell>
+					<Cell style="text-align: center;">{$_('outputs.date')}</Cell>
 					<Space w="xl" />
 					<Space w="xl" />
-					<Cell style="text-align: center;">Action</Cell>
+					<Cell style="text-align: center;">{$_('outputs.action')}</Cell>
 				</Row>
 			</Head>
 			<Body>
@@ -246,7 +262,7 @@
 							<Button
 								variant="outline"
 								on:click={() => downloadFile(item.filename)}
-								><File /> <Space w="xs" /> Download</Button
+								><File /> <Space w="xs" /> {$_('outputs.download')}</Button
 							></Cell
 						>
 					</Row>
@@ -261,13 +277,13 @@
 		<DataTable table$aria-label="db info" style="max-width: 100%;">
 			<Head>
 				<Row>
-					<Cell style="text-align: left;">Filename</Cell>
+					<Cell style="text-align: left;">{$_('outputs.filename')}</Cell>
 					<Space w="xl" />
 					<Space w="xl" />
-					<Cell style="text-align: center;">Date</Cell>
+					<Cell style="text-align: center;">{$_('outputs.date')}</Cell>
 					<Space w="xl" />
 					<Space w="xl" />
-					<Cell style="text-align: center;">Action</Cell>
+					<Cell style="text-align: center;">{$_('outputs.action')}</Cell>
 				</Row>
 			</Head>
 			<Body>
@@ -285,7 +301,7 @@
 							<Button
 								variant="outline"
 								on:click={() => downloadFile(item.filename)}
-								><File /> <Space w="xs" /> Download</Button
+								><File /> <Space w="xs" /> {$_('outputs.download')}</Button
 							></Cell
 						>
 					</Row>
@@ -300,13 +316,13 @@
 		<DataTable table$aria-label="db info" style="max-width: 100%;">
 			<Head>
 				<Row>
-					<Cell style="text-align: left;">Filename</Cell>
+					<Cell style="text-align: left;">{$_('outputs.filename')}</Cell>
 					<Space w="xl" />
 					<Space w="xl" />
-					<Cell style="text-align: center;">Date</Cell>
+					<Cell style="text-align: center;">{$_('outputs.date')}</Cell>
 					<Space w="xl" />
 					<Space w="xl" />
-					<Cell style="text-align: center;">Action</Cell>
+					<Cell style="text-align: center;">{$_('outputs.action')}</Cell>
 				</Row>
 			</Head>
 			<Body>
@@ -324,7 +340,7 @@
 							<Button
 								variant="outline"
 								on:click={() => downloadFile(item.filename)}
-								><File /> <Space w="xs" /> Download</Button
+								><File /> <Space w="xs" /> {$_('outputs.download')}</Button
 							></Cell
 						>
 					</Row>
@@ -339,13 +355,13 @@
 		<DataTable table$aria-label="db info" style="max-width: 100%;">
 			<Head>
 				<Row>
-					<Cell style="text-align: left;">Filename</Cell>
+					<Cell style="text-align: left;">{$_('outputs.filename')}</Cell>
 					<Space w="xl" />
 					<Space w="xl" />
-					<Cell style="text-align: center;">Date</Cell>
+					<Cell style="text-align: center;">{$_('outputs.date')}</Cell>
 					<Space w="xl" />
 					<Space w="xl" />
-					<Cell style="text-align: center;">Action</Cell>
+					<Cell style="text-align: center;">{$_('outputs.action')}</Cell>
 				</Row>
 			</Head>
 			<Body>
@@ -363,7 +379,7 @@
 							<Button
 								variant="outline"
 								on:click={() => downloadFile(item.filename)}
-								><File /> <Space w="xs" /> Download</Button
+								><File /> <Space w="xs" /> {$_('outputs.download')}</Button
 							></Cell
 						>
 					</Row>
@@ -378,13 +394,13 @@
 		<DataTable table$aria-label="db info" style="max-width: 100%;">
 			<Head>
 				<Row>
-					<Cell style="text-align: left;">Filename</Cell>
+					<Cell style="text-align: left;">{$_('outputs.filename')}</Cell>
 					<Space w="xl" />
 					<Space w="xl" />
-					<Cell style="text-align: center;">Date</Cell>
+					<Cell style="text-align: center;">{$_('outputs.date')}</Cell>
 					<Space w="xl" />
 					<Space w="xl" />
-					<Cell style="text-align: center;">Action</Cell>
+					<Cell style="text-align: center;">{$_('outputs.action')}</Cell>
 				</Row>
 			</Head>
 			<Body>
@@ -402,7 +418,7 @@
 							<Button
 								variant="outline"
 								on:click={() => downloadFile(item.filename)}
-								><File /> <Space w="xs" /> Download</Button
+								><File /> <Space w="xs" /> {$_('outputs.download')}</Button
 							></Cell
 						>
 					</Row>
@@ -413,20 +429,25 @@
 	{/if}
 	<Divider labelPosition="center" size="md" />
 	<Space h="xl" />
-	<Button color="red" on:click={() => (deletedModalOpened = true)}
-		>Delete all files</Button
-	>
+	<SimpleGrid cols={6}>
+		<Button color="red" on:click={() => (deletedModalOpened = true)}
+			>{$_('outputs.button_delete')}</Button
+		>
+		<Button variant="outline" on:click={() => downloadAll()}
+			>{$_('outputs.button_download_all')}</Button
+		>
+	</SimpleGrid>	
 	<Modal
 		opened={deletedModalOpened}
 		on:close={() => (deletedModalOpened = false)}
 		centered
 		withCloseButton={false}
 	>
-		<p>Are you sure you want to delete all files in the outputs folder?</p>
-		<p><strong>This operation is not reversible.</strong></p>
+		<p>{$_('outputs.deleting_text')}</p>
+		<p><strong>{$_('outputs.deleting_warning')}</strong></p>
 		<Center
 			><Button color="red" on:click={deleteAllFiles}>
-				Remove</Button
+				{$_('outputs.button_confirm_delete')}</Button
 			></Center
 		>
 	</Modal>

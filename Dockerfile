@@ -6,6 +6,20 @@ RUN npm run build
 
 FROM mambaorg/micromamba:1.4.8-bullseye-slim
 
+USER root
+
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    curl \
+    gdebi-core \
+    && rm -rf /var/lib/apt/lists/*
+
+ARG QUARTO_VERSION="1.2.475"
+RUN curl -o quarto-linux-amd64.deb -L https://github.com/quarto-dev/quarto-cli/releases/download/v${QUARTO_VERSION}/quarto-${QUARTO_VERSION}-linux-amd64.deb
+RUN gdebi --non-interactive quarto-linux-amd64.deb
+RUN rm quarto-linux-amd64.deb
+RUN apt remove -y curl gdebi-core
+
+USER $MAMBA_USER
 
 COPY --chown=$MAMBA_USER:$MAMBA_USER env.yaml /tmp/env.yaml
 RUN micromamba create -y -f /tmp/env.yaml \

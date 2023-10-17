@@ -10,6 +10,7 @@
 	} from "@svelteuidev/core";
 	import { typewriter } from "@svelteuidev/motion";
 	import { onMount } from "svelte";
+	import { _ } from 'svelte-i18n'
 	import {
 		Footer,
 		FooterBrand,
@@ -39,7 +40,7 @@
 		active = (active + 1) % 3
 	}, 1500);
 
-	import { blur } from 'svelte/transition';
+	import { blur } from 'svelte/transition'; 
 </script>
 
 <svelte:head>
@@ -61,7 +62,7 @@
 			</Center>
 		</span>
 		{#if visible}
-			<p in:typewriter={{ speed: 2 }}>{text}</p>
+			<p in:typewriter={{ speed: 2 }}>{$_('home.banner')}</p>
 			
 		{/if}
 		{#if visible2}
@@ -75,7 +76,7 @@
 
 <Center>
 	<Divider
-		label="Steps to follow"
+		label="{$_('home.steps_follow')}"
 		labelPosition="center"
 		style="min-width: 60%;max-width: 55%;"
 	/>
@@ -84,21 +85,21 @@
 
 <Center>
 	<Timeline color="yellow" active={active} lineWidth={4} bulletSize={20}>
-		<Timeline.Item title="Map data">
+		<Timeline.Item title="{$_('home.map_data_title')}">
 			<Text color="dimmed" size="sm"
-				>Select project and map input data</Text
+				>{$_('home.map_data_text')}</Text
 			>
 		</Timeline.Item>
 
-		<Timeline.Item title="Run analysis" lineVariant="dashed">
+		<Timeline.Item title="{$_('home.runanalysis_title')}" lineVariant="dashed">
 			<Text color="dimmed" size="sm"
-				>Select project and launch analysis</Text
+				>{$_('home.runanalysis_text')}</Text
 			>
 		</Timeline.Item>
 
-		<Timeline.Item title="Retrieve outputs">
+		<Timeline.Item title="{$_('home.retrieve_outputs_title')}">
 			<Text color="dimmed" size="sm"
-				>Once analyses have run successfully</Text
+				>{$_('home.retrieve_outputs_text')}</Text
 			>
 		</Timeline.Item>
 	</Timeline>
@@ -110,12 +111,12 @@
 	<FooterLinkGroup
 		ulClass="flex flex-wrap items-center mt-3 text-sm text-gray-500 dark:text-gray-400 sm:mt-0"
 	>
-		<FooterLink href="/about">About</FooterLink>
-		<FooterLink href="/about#authors">Author(s)</FooterLink>
-		<FooterLink href="/about#funding">Funding</FooterLink>
-		<FooterLink href="/about#termsconditions">Terms&Conditions</FooterLink>
+		<FooterLink href="/about">{$_('footer.about')}</FooterLink>
+		<FooterLink href="/about#authors">{$_('footer.authors')}</FooterLink>
+		<FooterLink href="/about#funding">{$_('footer.funding')}</FooterLink>
+		<FooterLink href="/about#termsconditions">{$_('footer.termconditions')}</FooterLink>
 		<FooterLink href="https://cienciadedatosysalud.org/en/contact/"
-			>Contact</FooterLink
+			>{$_('footer.contact')}</FooterLink
 		>
 	</FooterLinkGroup>
 </Footer>

@@ -35,6 +35,7 @@
 	import { Check, Cross2 } from "radix-icons-svelte";
 	import DataTable, { Head, Body, Row, Cell } from "@smui/data-table";
 	import {Select} from "flowbite-svelte";
+	import { _ } from 'svelte-i18n'
 	/**
 	 * @type {String}
 	 */
@@ -75,8 +76,8 @@
 		const res_json = await res.json();
 
 		map_datetime.set(new Date());
-		if (res.status == 200) {
-			step_running.set(0);
+		step_running.set(0);
+		if (res.ok) {
 			return res_json["output"];
 		} else {
 			status_fails.set(true);
@@ -91,9 +92,8 @@
 
 		checking_datetime.set(new Date());
 		dqa_datetime.set(new Date());
-		
-		if (res.status == 200) {
-			step_running.set(1);
+		step_running.set(1);
+		if (res.ok) {			
 			return res_json["output"];
 		} else {
 			status_fails.set(true);
@@ -104,11 +104,10 @@
 
 	async function doDQA() {
 		const res = await fetch(`/api/dqa/${ProjectInfoSelected}`);
-
 		const res_json = await res.json();
 		dqa_datetime.set(new Date());
-		if (res.status == 200) {
-			step_running.set(2);
+		step_running.set(2);
+		if (res.ok) {
 			return res_json["output"];
 		} else {
 			status_fails.set(true);
@@ -121,8 +120,8 @@
 		const res = await fetch(`/api/validator/${ProjectInfoSelected}`);
 		const res_json = await res.json();
 		validator_datetime.set(new Date());
-		if (res.status == 200) {
-			step_running.set(3);
+		step_running.set(3);
+		if (res.ok) {
 			return res_json["output"];
 		} else {
 			status_fails.set(true);
@@ -185,25 +184,26 @@
 	<meta name="Map your data" content="Map data" />
 </svelte:head>
 
-<h1>Map your data</h1>
+<h1>{$_('mapdata.title')}</h1>
 <Space h="xl" />
 <p>
-	Select the project you want to participate in and introduce your data for
-	analysis. Data should be extracted from your health information systems
-	following the requirements and specifications of the data model of the use
-	case in which you want to participate.
+	{$_('mapdata.explanation_1')}
 </p>
 <Space h="xl" />
 <Select
 	bind:value={selectedOption}
 	items={$listProjects}
-	placeholder="Select one project"
+	placeholder="{$_('mapdata.default_selection')}"
 	label="Select a project"
 	on:change={() => (ProjectInfoSelected = $ProjectsInfo[selectedOption]["uuid"])}
 />
 <Space h="xl" />
+<p>
+	{$_('mapdata.explanation_2')}
+</p>
+<Space h="xl" />
 <Button color="dark" radius="lg" size="md" on:click={uploadFileClick}
-	>Select your files</Button
+	>{$_('mapdata.button_files')}</Button
 >
 <input
 	id="file-to-upload"
@@ -215,7 +215,7 @@
 />
 {#if files && files["length"] > 0}
 	<Divider
-		label="Selected csv files"
+		label="{$_('mapdata.csv_selected')}"
 		labelPosition="center"
 		variant="dashed"
 	/>
@@ -223,10 +223,10 @@
 		<DataTable table$aria-label="db info" style="max-width: 100%;">
 			<Head>
 				<Row>
-					<Cell style="text-align: left;">Filename</Cell>
+					<Cell style="text-align: left;">{$_('mapdata.file_name')}</Cell>
 					<Space w="xl" />
 					<Space w="xl" />
-					<Cell style="text-align: center;">Size</Cell>
+					<Cell style="text-align: center;">{$_('mapdata.file_size')}</Cell>
 				</Row>
 			</Head>
 			<Body>
@@ -256,7 +256,7 @@
 		$running_analysis}
 	on:click={upload}
 >
-	Map and check your data
+{$_('mapdata.button_mapping')}
 </Button>
 
 <Space h="xl" />
@@ -269,39 +269,39 @@
 	lineWidth={4}
 	bulletSize={20}
 >
-	<Timeline.Item title="Mapping data" bullet={Status}>
+	<Timeline.Item title="{$_('mapdata.step_mapping')}" bullet={Status}>
 		<Text size="xs"
 			>{#if $step_running >= 0}
 				{secondsDiff($map_datetime, $beggining_datetime)}
 			{:else}
 				0
-			{/if}seconds</Text
+			{/if} {$_('mapdata.seconds')}</Text
 		>
 	</Timeline.Item>
-	<Timeline.Item title="Checking data syntax" bullet={Status}>
+	<Timeline.Item title="{$_('mapdata.step_checking')}" bullet={Status}>
 		<Text size="xs"
 			>{#if $step_running >= 1}{secondsDiff(
 					$checking_datetime,
 					$map_datetime
 				)}{:else}
 				0
-			{/if} seconds</Text
+			{/if} {$_('mapdata.seconds')}</Text
 		>
 	</Timeline.Item>
 
-	<Timeline.Item title="Launching data quality assesment" bullet={Status}>
+	<Timeline.Item title="{$_('mapdata.step_launching_data_quality')}" bullet={Status}>
 		<Text size="xs"
 			>{#if $step_running >= 2}{secondsDiff(
 					$dqa_datetime,
 					$checking_datetime
 				)}{:else}
 				0
-			{/if} seconds</Text
+			{/if} {$_('mapdata.seconds')}</Text
 		>
 	</Timeline.Item>
 
 	<Timeline.Item
-		title="Checking data compliance with validation rules"
+		title="{$_('mapdata.step_checking_rules')}"
 		lineVariant="dashed"
 		bullet={Status}
 	>
@@ -311,15 +311,15 @@
 					$dqa_datetime
 				)}{:else}
 				0
-			{/if} seconds</Text
+			{/if} {$_('mapdata.seconds')}</Text
 		>
 	</Timeline.Item>
 
-	<Timeline.Item title="All set! Go for the analyses" />
+	<Timeline.Item title="{$_('mapdata.step_allset')}" />
 	<Space h="xl" />
 	<Space h="xl" />
 	<Button color="dark" disabled={$step_running < 3} on:click={goDownloads}
-		>Download log</Button
+		>{$_('mapdata.button_download')}</Button
 	>
 	<Space h="xl" />
 	<Space h="xl" />
@@ -327,17 +327,17 @@
 		{#await $promise_upload_file}
 			<!-- promise is pending -->
 			<Notification
-				title="Uploading data"
+				title="{$_('mapdata.notification_1_title_1')}"
 				loading
 				withCloseButton={false}
 			>
-				Please wait while your files is being uploaded.
+			{$_('mapdata.notification_1_text_1')}
 			</Notification>
 			<Space h="xl" />
 		{:then value}
 			<!-- promise was fulfilled -->
 			<Notification
-				title='Log "Mapping data" preview. For more information go to the outputs tab and download the "mapping_input_files.log" file in the logs section.'
+				title='{$_('mapdata.notification_1_title_2')}'
 				icon={Check}
 				color="teal"
 				withCloseButton={false}
@@ -370,17 +370,17 @@
 		{#await $promise_check_sintax}
 			<!-- promise is pending -->
 			<Notification
-				title="Checking data syntax"
+				title="{$_('mapdata.notification_2_title_1')}"
 				loading
 				withCloseButton={false}
 			>
-				Please wait while your data is being checked.
+			{$_('mapdata.notification_2_text_1')}
 			</Notification>
 			<Space h="xl" />
 		{:then value}
 			<!-- promise was fulfilled -->
 			<Notification
-				title='Log "Checking data syntax" preview. For more information go to the outputs tab and download the "checking_data_syntax.log" file in the logs section.'
+				title='{$_('mapdata.notification_2_title_2')}'
 				icon={Check}
 				color="teal"
 				withCloseButton={false}
@@ -418,17 +418,17 @@
 		{#await $promise_dqa}
 			<!-- promise is pending -->
 			<Notification
-				title="Data Quality Assesment"
+				title="{$_('mapdata.notification_3_title_1')}"
 				loading
 				withCloseButton={false}
 			>
-				Please wait while the data quality assessment is running.
+			{$_('mapdata.notification_3_text_1')}
 			</Notification>
 			<Space h="xl" />
 		{:then value}
 			<!-- promise was fulfilled -->
 			<Notification
-				title='Log "Data Quality Assesment" preview. For more information go to the outputs tab and download the "data_quality_assesment.log" file in the logs section.'
+				title='{$_('mapdata.notification_3_title_2')}'
 				icon={Check}
 				color="teal"
 				withCloseButton={false}
@@ -466,17 +466,17 @@
 		{#await $promise_validator}
 			<!-- promise is pending -->
 			<Notification
-				title="Checking data compliance with validation rules"
+				title="{$_('mapdata.notification_4_title_1')}"
 				loading
 				withCloseButton={false}
 			>
-				Please wait while data compliance with validation rules is running
+			{$_('mapdata.notification_4_text_1')}
 			</Notification>
 			<Space h="xl" />
 		{:then value}
 			<!-- promise was fulfilled -->
 			<Notification
-				title='Log "Checking data compliance with validation rules" preview. For more information go to the outputs tab and download the "checking_data_compliance.log" file in the logs section.'
+				title='{$_('mapdata.notification_4_title_2')}'
 				icon={Check}
 				color="teal"
 				withCloseButton={false}

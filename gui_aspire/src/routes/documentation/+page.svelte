@@ -3,6 +3,7 @@
 	import { apiData, listProjects, ProjectsInfo } from "./store";
 	import {Space, Text, Divider, Button } from "@svelteuidev/core";
 	import {Select} from "flowbite-svelte";
+	import { _ } from 'svelte-i18n'
 	import.meta.env.MODE;
 	/**
 	 * @type {String}
@@ -42,66 +43,65 @@
 	<meta name="Documentation" content="Documentation" />
 </svelte:head>
 
-<h1>Documentation</h1>
+<h1>{$_('documentation.title')}</h1>
 <Space h="xl" />
 <p>
-	In this page you can see the documentation of all the projects that are loaded
-	in the application.
+	{$_('documentation.explanation')}
 </p>
 <Space h="xl" />
 <Select
 	bind:value={selectedOption}
 	items={$listProjects}
-	placeholder="Select one project"
+	placeholder="{$_('documentation.selector_project')}"
 	label="Select a project to view its information"
 	on:change={() => (ProjectInfoSelected = $ProjectsInfo[selectedOption])}
 />
 
 {#if ProjectInfoSelected}
 <Space h="xl" />
-<Button color="dark" on:click={downloadDocs}>Download documentation</Button>
+<Button color="dark" on:click={downloadDocs}>{$_('documentation.button_download')}</Button>
 <Space h="xl" />
-	<Divider label="Metadata" labelPosition="center" size="md" />
+	<Divider label="{$_('documentation.label_metadata')}" labelPosition="center" size="md" />
 	<p>
-		<strong>Project: </strong>{ProjectInfoSelected.data.metadata.project}
+		<strong>{$_('documentation.doc_project')} </strong>{ProjectInfoSelected.data.metadata.project}
 	</p>
 	<p>
-		<strong>Use case: </strong>{ProjectInfoSelected.data.metadata.use_case}
+		<strong>{$_('documentation.doc_usecase')} </strong>{ProjectInfoSelected.data.metadata.use_case}
 	</p>
 	<p>
-		<strong>Funder: </strong>{ProjectInfoSelected.data.metadata.funder}
+		<strong>{$_('documentation.doc_funder')} </strong>{ProjectInfoSelected.data.metadata.funder}
 	</p>
 	<p>
-		<strong>Description: </strong>{ProjectInfoSelected.data.metadata
+		<strong>{$_('documentation.doc_description')} </strong>{ProjectInfoSelected.data.metadata
 			.description}
 	</p>
 	<p>
-		<strong>Notes: </strong>{ProjectInfoSelected.data.metadata.notes}
+		<strong>{$_('documentation.doc_notes')} </strong>{ProjectInfoSelected.data.metadata.notes}
 	</p>
 
-	<Divider label="Cohort" labelPosition="center" size="md" />
+	<Divider label="{$_('documentation.label_cohort')}" labelPosition="center" size="md" />
 	<p>
-		<strong>Name: </strong>{ProjectInfoSelected.data.cohort.name}
+		<strong>{$_('documentation.doc_name')} </strong>{ProjectInfoSelected.data.cohort.name}
 	</p>
 	<Space h="xs" />
 	<div style="display: flex">
 		<Text
-			><strong>Beggining study period: </strong>{ProjectInfoSelected.data
+			><strong>{$_('documentation.doc_bstudydate')} </strong>{ProjectInfoSelected.data
 				.cohort.beggining_study_period}</Text
 		>
 		<Space w="lg" />
 		<Text
-			><strong>End study period: </strong>{ProjectInfoSelected.data.cohort
+			><strong>{$_('documentation.doc_estudydate')} </strong>{ProjectInfoSelected.data.cohort
 				.end_study_period}</Text
 		>
 	</div>
 	<Space h="xs" />
 	<p>
-		<strong>Inclusion criteria: </strong>{ProjectInfoSelected.data.cohort
+		<strong>{$_('documentation.doc_icriteria')} </strong>{ProjectInfoSelected.data.cohort
 			.inclusion_criteria}
 	</p>
 	<p>
-		<strong>Exclusion criteria: </strong>{ProjectInfoSelected.data.cohort
+		<strong>{$_('documentation.doc_ecriteria')} </strong>{ProjectInfoSelected.data.cohort
 			.exclusion_criteria}
 	</p>
 {/if}

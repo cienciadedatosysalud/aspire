@@ -6,7 +6,7 @@
 	import { newNotification } from "./results/store";
 	import { scale } from "svelte/transition";
 	import { quintOut } from "svelte/easing";
-	
+	import { _ } from 'svelte-i18n'
 </script>
 
 <header>
@@ -22,14 +22,14 @@
 		</svg>
 		<ul>
 			<li aria-current={$page.url.pathname === "/" ? "page" : undefined}>
-				<a href="/">Home</a>
+				<a href="/">{$_('header.home')}</a>
 			</li>
 			<li
 				aria-current={$page.url.pathname === "/mapdata"
 					? "page"
 					: undefined}
 			>
-				<a href="/mapdata">Map data</a>
+				<a href="/mapdata">{$_('header.mapdata')}</a>
 			</li>
 			
 			<li
@@ -37,7 +37,7 @@
 					? "page"
 					: undefined}
 			>
-				<a href="/analysis">Run analysis</a>
+				<a href="/analysis">{$_('header.runanalysis')}</a>
 			</li>
 			
 			<li
@@ -46,7 +46,7 @@
 					: undefined}
 			>
 				<a href="/results"
-					>Outputs
+					>{$_('header.outputs')}
 					{#if $newNotification}
 						<div
 							transition:scale={{
@@ -68,7 +68,7 @@
 					? "page"
 					: undefined}
 			>
-				<a href="/documentation">Documentation</a>
+				<a href="/documentation">{$_('header.documentation')}</a>
 			</li>
 			<hr class="dashed" style="height:30%;"/>
 			<li
@@ -76,7 +76,7 @@
 					? "page"
 					: undefined}
 			>
-				<a href="/about">About</a>
+				<a href="/about">{$_('header.about')}</a>
 			</li>
 		</ul>
 		<svg viewBox="0 0 2 3" aria-hidden="true">

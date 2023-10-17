@@ -26,6 +26,7 @@
 	import DataTable, { Head, Body, Row, Cell } from "@smui/data-table";
 
 	import {Select} from "flowbite-svelte";
+	import { _ } from 'svelte-i18n'
 
 	/**
 	 * @type {String}
@@ -113,32 +114,32 @@
 	<meta name="description" content="Run analysis" />
 </svelte:head>
 
-<h1>Run analysis</h1>
+<h1>{$_('runanalysis.title')}</h1>
 <Space h="xl" />
 <p>
-	Select the project you want to participate in and launch the analyses provided by the project coordinators. Analyses scripts are open source and can be audited by anyone.
+	{$_('runanalysis.explanation')}
 </p>
 <Space h="xl" />
-<Divider label="Projects" labelPosition="center" size="md" />
+<Divider label="{$_('runanalysis.separator_projects')}" labelPosition="center" size="md" />
 <Space h="xl" />
 <Select
 	bind:value={selectedProject}
 	items={$listProjects}
-	placeholder="Select one project"
+	placeholder="{$_('runanalysis.selector_project')}"
 	label="Select a project to run its analysis"
 	on:change={() => filterScripts()}
 />
 <Space h="xl" />
-<Divider label="Mapped entities" labelPosition="center" size="md" />
+<Divider label="{$_('runanalysis.separator_entities')}" labelPosition="center" size="md" />
 {#if selectedProject}
 	<Center>
 		<DataTable table$aria-label="db info" style="max-width: 100%;">
 			<Head>
 				<Row>
-					<Cell style="text-align: left;">Entity name</Cell>
+					<Cell style="text-align: left;">{$_('runanalysis.table_entities_name')}</Cell>
 					<Space w="xl" />
 					<Space w="xl" />
-					<Cell style="text-align: center;">N registries</Cell
+					<Cell style="text-align: center;">{$_('runanalysis.table_entities_nregistries')}</Cell
 					>
 				</Row>
 			</Head>
@@ -159,12 +160,12 @@
 {/if}
 
 <Space h="xl" />
-<Divider label="Scripts" labelPosition="center" size="md" />
+<Divider label="{$_('runanalysis.separator_scripts')}" labelPosition="center" size="md" />
 <Space h="xl" />
 <Select
 	bind:value={selectedScript}
 	items={listFilesProject}
-	placeholder="Select one script"
+	placeholder="{$_('runanalysis.selector_script')}"
 	label="Select the main script to run."
 	on:change={() => (ScriptSelected = selectedScript)}
 />
@@ -179,19 +180,19 @@
 	disabled={ProjectInfoSelected === undefined || ScriptSelected === undefined}
 	on:click={handleClick}
 >
-	Run analysis
+{$_('runanalysis.button_run')}
 </Button>
 <Space h="xl" />
 <Space h="xl" />
 {#if $status_promise || $notification_execution}
 	{#await $promise}
 		<!-- promise is pending -->
-		<Notification title="Executing script" loading withCloseButton={false}>
-			Please wait while your data is being analyzed.
+		<Notification title="{$_('runanalysis.notification_title')}" loading withCloseButton={false}>
+			{$_('runanalysis.notification_wait')}
 		</Notification>
 	{:then value}
 		<!-- promise was fulfilled -->
-		<Notification title='Log "Analysis Execution" preview. For more information go to the outputs tab and download the "analysis_execution.log" file in the logs section.' icon={Check} color="teal">
+		<Notification title='{$_('runanalysis.notification_log')}' icon={Check} color="teal">
 			<div
 				id="bodydesc"
 				style="margin-left:auto; margin-right:auto; height: 200px; overflow-y: scroll;"
@@ -205,7 +206,7 @@
 		</Notification>
 	{:catch error}
 		<!-- promise was rejected -->
-		<Notification title='Log "Analysis Execution" error. For more information go to the outputs tab and download the "analysis_execution.log" file in the logs section.' icon={Cross2} color="red">
+		<Notification title='{$_('runanalysis.notification_log_error')}' icon={Cross2} color="red">
 			<div
 				id="bodydesc"
 				style="margin-left:auto; margin-right:auto; height: 200px; overflow-y: scroll;"
