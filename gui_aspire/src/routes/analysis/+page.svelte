@@ -92,7 +92,6 @@
 		);
 		const res_json = await res.json();
 		status_promise.set(false);
-		notification_execution.set(false)
 		if (res.ok) {
 			newNotification.set(true);
 			return res_json["output"];
@@ -110,8 +109,7 @@
 </script>
 
 <svelte:head>
-	{#if !$notification_execution}<title>Analysis</title>{/if}
-	{#if $notification_execution}<title>Running analysis...</title>{/if}
+	<title>Analysis</title>
 	<meta name="description" content="Run analysis" />
 </svelte:head>
 
