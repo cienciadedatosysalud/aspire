@@ -70,7 +70,7 @@ and ![orcid](https://orcid.org/sites/default/files/images/orcid_16x16.png) [Sant
 
 ASPIRE uses [i18n for Svelte](https://github.com/kaisermann/svelte-i18n) for internationalization.
 
-Currently ASPIRE supports English by default and Spanish. Language selection is based on the default language set in your browser.
+Currently ASPIRE supports English (by default) and Spanish. Language selection is based on the default language set in your browser.
 
 You can contribute adding another language by downloading the [en.json](https://github.com/cienciadedatosysalud/aspire/blob/main/gui_aspire/src/lib/i18n/locales/en.json) file, modify the json file without changing the value of the keys and changing each value to your language. It is important to respect all punctuation marks and escape characters.
 
