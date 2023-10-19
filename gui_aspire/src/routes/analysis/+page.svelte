@@ -92,6 +92,7 @@
 		);
 		const res_json = await res.json();
 		status_promise.set(false);
+		notification_execution.set(false)
 		if (res.ok) {
 			newNotification.set(true);
 			return res_json["output"];
