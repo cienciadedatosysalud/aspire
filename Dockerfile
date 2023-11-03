@@ -23,6 +23,7 @@ USER $MAMBA_USER
 
 COPY --chown=$MAMBA_USER:$MAMBA_USER env.yaml /tmp/env.yaml
 RUN micromamba create -y -f /tmp/env.yaml \
+    && micromamba run -n aspire pip uninstall -y tangled_up_in_unicode \
     && micromamba clean --all --yes \
     && rm -rf /opt/conda/conda-meta /tmp/env.yaml
 
