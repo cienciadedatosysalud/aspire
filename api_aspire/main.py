@@ -33,7 +33,7 @@ app.add_middleware(
 )
 
 def get_project_path_by_uuid(uuid: str):
-    project_path = "projects"
+    project_path = os.path.join(os.path.dirname(os.path.realpath(__file__)),"projects")
     conf_files_path = glob.glob(project_path + "/**/docs/CDM/cdmb_config.json", recursive=True)
     response = None
     for conf_file_path in conf_files_path:
@@ -86,7 +86,7 @@ def delete_input_directory(file_paths_):
 
 @app.get("/api/projects")
 def get_projects():
-    project_path = "projects"
+    project_path = os.path.join(os.path.dirname(os.path.realpath(__file__)),"projects")
     conf_files_path = glob.glob(project_path + "/**/docs/CDM/cdmb_config.json", recursive=True)
     response = []
     for conf_file_path in conf_files_path:
@@ -135,7 +135,7 @@ def get_projects_db(project_id: str):
 
 @app.get("/api/results")
 def get_results():
-    project_path = "projects"
+    project_path = os.path.join(os.path.dirname(os.path.realpath(__file__)),"projects")
     outputs_files = list(filter(os.path.isfile, glob.glob(project_path + "/**/outputs/**", recursive=True)))
     outputs_files.sort(key=os.path.getctime, reverse=True)
     response_files = []
@@ -495,7 +495,7 @@ async def delete_outputs_files(project_id: str):
     return {"status_code": status, "output": output}
 
 
-app.mount("/", StaticFiles(directory="front", html=True), name="front")
+app.mount("/", StaticFiles(directory=os.path.join(os.path.dirname(os.path.realpath(__file__)),"front"), html=True), name="front")
 
 
 @app.exception_handler(StarletteHTTPException)
