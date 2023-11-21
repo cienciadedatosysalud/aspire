@@ -19,6 +19,10 @@
 		const response = await fetch("/api/projects");
 		const data = await response.json();
 		apiData.set(data);
+		if($listProjects.length == 1){
+			selectedOption = $listProjects[0].value
+			ProjectInfoSelected = $ProjectsInfo[selectedOption]
+		}
 	});
 
 	async function downloadDocs(){

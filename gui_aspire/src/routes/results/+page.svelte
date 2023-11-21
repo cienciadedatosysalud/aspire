@@ -29,6 +29,10 @@
 		const response = await fetch("/api/results");
 		const data = await response.json();
 		apiData.set(data);
+		if($listProjects.length == 1){
+			selectedOption = $listProjects[0].value
+			projectChange($ProjectsInfo[selectedOption]["uuid"])
+		}
 	});
 	
 

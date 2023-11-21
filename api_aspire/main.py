@@ -434,7 +434,7 @@ def zipfiles(file_list):
     io = BytesIO()
     with zipfile.ZipFile(io, mode='w', compression=zipfile.ZIP_DEFLATED) as zip:
         for fpath in file_list:
-            zip.write(fpath,arcname=str(fpath).replace('projects/',''))
+            zip.write(fpath,arcname=str(fpath).split('projects/')[1])
         zip.close()
     return StreamingResponse(
         iter([io.getvalue()]),

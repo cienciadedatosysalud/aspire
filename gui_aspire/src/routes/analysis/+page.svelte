@@ -59,6 +59,10 @@
 		const response_files = await fetch("/api/analysis");
 		const data_files = await response_files.json();
 		apiFiles.set(data_files);
+		if($listProjects.length == 1){
+			selectedProject = $listProjects[0].value
+			filterScripts()
+		}
 	});
 
 	/**
@@ -82,6 +86,11 @@
 		const listFilesProject_2 = listFilesProject_[0].files;
 		listFilesProject = listFilesProject_2.map((x) => ({value:x, 
         name:x}));
+		if(listFilesProject.length==1){
+			selectedScript = listFilesProject[0].value
+			ScriptSelected = listFilesProject[0].value
+		}
+
 	}
 
 	async function runAnalysis() {
