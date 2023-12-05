@@ -187,6 +187,7 @@ def launch_dqa(project_id: str):
     output_path = os.path.join(path, 'outputs', 'logs')
     if not os.path.exists(output_path):
         os.makedirs(output_path)
+    get_installed_libraries(output_path, os.path.join(path, 'docs', 'CDM', 'cdmb_config.json'))
     ts_script = time.time()
     process = subprocess.Popen(["python3", dqa_path],
                                stdout=subprocess.PIPE, stderr=subprocess.STDOUT, universal_newlines=True)
@@ -220,6 +221,7 @@ def launch_checking(project_id: str):
     output_path = os.path.join(path, 'outputs', 'logs')
     if not os.path.exists(output_path):
         os.makedirs(output_path)
+    get_installed_libraries(output_path, os.path.join(path, 'docs', 'CDM', 'cdmb_config.json'))
     ts_script = time.time()
     process = subprocess.Popen(["python3", checking_path],
                                stdout=subprocess.PIPE, stderr=subprocess.STDOUT, universal_newlines=True)
@@ -257,6 +259,7 @@ def launch_validator(project_id: str):
     output_path = os.path.join(path, 'outputs', 'logs')
     if not os.path.exists(output_path):
         os.makedirs(output_path)
+    get_installed_libraries(output_path, os.path.join(path, 'docs', 'CDM', 'cdmb_config.json'))
     ts_script = time.time()
     process = subprocess.Popen(["python3", validator_path],
                                stdout=subprocess.PIPE, stderr=subprocess.STDOUT, universal_newlines=True)
@@ -299,6 +302,39 @@ def launch_validator(project_id: str):
     return {"status_code": process.returncode, "output": output}
 
 
+def get_installed_libraries(output_path:str, cdmb_config_path:str):
+
+    script_version= f"""
+    #!/bin/bash
+    cdmb_version=$(cat {cdmb_config_path} | grep -E 'cdmb_version' | tr -d ' ",' | cut -d ':' -f 2)
+    echo "CDMB version: $cdmb_version" > "{output_path}/sys_info.log"
+    echo "ASPIRE version: $ASPIRE_VERSION" >> "{output_path}/sys_info.log"
+    echo "Pipeline version: $PIPELINE_VERSION \n" >> "{output_path}/sys_info.log"
+    """
+    process = subprocess.Popen(script_version,shell=True,
+                                   stdout=subprocess.PIPE, stderr=subprocess.STDOUT, universal_newlines=True)
+    output, error = process.communicate()
+    process.wait()
+
+    script_memory= f"""
+    #!/bin/bash
+    output=$(cat /proc/meminfo | grep -E 'MemTotal|MemFree|MemAvailable')
+    echo "$output \n" >> "{output_path}/sys_info.log"
+    """
+    process = subprocess.Popen(script_memory,shell=True,
+                                   stdout=subprocess.PIPE, stderr=subprocess.STDOUT, universal_newlines=True)
+    output, error = process.communicate()
+    process.wait()
+    script_libraries = f"""
+    #!/bin/bash
+    output=$(micromamba -n aspire list)
+    echo "$output" >> "{output_path}/sys_info.log"
+    """
+    process = subprocess.Popen(script_libraries,shell=True,
+                                   stdout=subprocess.PIPE, stderr=subprocess.STDOUT, universal_newlines=True)
+    output, error = process.communicate()
+    process.wait()
+
 # Launch analysis
 @app.get("/api/analysis/{project_id}/{script_name}")
 def launch_analysis(project_id: str, script_name: str):
@@ -311,6 +347,7 @@ def launch_analysis(project_id: str, script_name: str):
     if not isExisting:
         raise HTTPException(status_code=400, detail='Cannot find ' + script_name + ' in your project')
 
+    get_installed_libraries(output_path, os.path.join(path, 'docs', 'CDM', 'cdmb_config.json'))
     file_name, file_extension = os.path.splitext(script_path)
     file_extension = file_extension.upper()
     if file_extension == ".R":

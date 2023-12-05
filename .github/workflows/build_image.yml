@@ -35,3 +35,5 @@ jobs:
           push: true
           tags: ghcr.io/${{ env.IMAGE_NAME }}:${{env.TAG_NAME}},ghcr.io/${{ env.IMAGE_NAME }}:latest
           file: ./Dockerfile
+          build-args: |
+            aspire_version=${{ env.TAG_NAME }}

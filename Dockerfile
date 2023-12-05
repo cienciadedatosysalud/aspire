@@ -8,16 +8,19 @@ FROM mambaorg/micromamba:1.4.8-bullseye-slim
 
 USER root
 
+ARG aspire_version="Non-versioned"
+ENV ASPIRE_VERSION=$aspire_version
+
 RUN apt-get update && apt-get install -y --no-install-recommends \
     curl \
     gdebi-core \
     && rm -rf /var/lib/apt/lists/*
 
 ARG QUARTO_VERSION="1.2.475"
-RUN curl -o quarto-linux-amd64.deb -L https://github.com/quarto-dev/quarto-cli/releases/download/v${QUARTO_VERSION}/quarto-${QUARTO_VERSION}-linux-amd64.deb
-RUN gdebi --non-interactive quarto-linux-amd64.deb
-RUN rm quarto-linux-amd64.deb
-RUN apt remove -y curl gdebi-core
+RUN curl -o quarto-linux-amd64.deb -L https://github.com/quarto-dev/quarto-cli/releases/download/v${QUARTO_VERSION}/quarto-${QUARTO_VERSION}-linux-amd64.deb \
+    && gdebi --non-interactive quarto-linux-amd64.deb \
+    && rm quarto-linux-amd64.deb \
+    && apt remove -y curl gdebi-core
 
 USER $MAMBA_USER
 
