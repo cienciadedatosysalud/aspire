@@ -6,13 +6,37 @@
 	import { newNotification } from "./results/store";
 	import { scale } from "svelte/transition";
 	import { quintOut } from "svelte/easing";
-	import { _ } from 'svelte-i18n'
+	import { _ } from "svelte-i18n";
+	import { Button, Tooltip } from "flowbite-svelte";
+	import { onMount } from "svelte";
+
+	let memory = "NA GB" ;
+	async function fetchMemoryUsage() {
+		try {
+			const response = await fetch(
+				"/api/memoryusage",
+			);
+			memory = await response.json();
+		} catch (error) {			
+			memory = "NA GB";
+		}
+	}
+
+	onMount(() => {
+		fetchMemoryUsage();
+		const interval = setInterval(fetchMemoryUsage, 3500); // Fetch every 3.5 seconds
+		return () => clearInterval(interval);
+	});
 </script>
 
 <header>
 	<div class="corner">
 		<a href="https://cienciadedatosysalud.org/" target="_blank">
-			<img style="width: 100%; margin-left: 15px;" src={atlaslogo} alt="LogoAtlasVPM" />
+			<img
+				style="width: 100%; margin-left: 15px;"
+				src={atlaslogo}
+				alt="LogoAtlasVPM"
+			/>
 		</a>
 	</div>
 
@@ -22,31 +46,31 @@
 		</svg>
 		<ul>
 			<li aria-current={$page.url.pathname === "/" ? "page" : undefined}>
-				<a href="/">{$_('header.home')}</a>
+				<a href="/">{$_("header.home")}</a>
 			</li>
 			<li
 				aria-current={$page.url.pathname === "/mapdata"
 					? "page"
 					: undefined}
 			>
-				<a href="/mapdata">{$_('header.mapdata')}</a>
+				<a href="/mapdata">{$_("header.mapdata")}</a>
 			</li>
-			
+
 			<li
 				aria-current={$page.url.pathname === "/analysis"
 					? "page"
 					: undefined}
 			>
-				<a href="/analysis">{$_('header.runanalysis')}</a>
+				<a href="/analysis">{$_("header.runanalysis")}</a>
 			</li>
-			
+
 			<li
 				aria-current={$page.url.pathname === "/results"
 					? "page"
 					: undefined}
 			>
 				<a href="/results"
-					>{$_('header.outputs')}
+					>{$_("header.outputs")}
 					{#if $newNotification}
 						<div
 							transition:scale={{
@@ -62,21 +86,21 @@
 					{/if}
 				</a>
 			</li>
-			<hr class="dashed" style="height:30%;"/>
+			<hr class="dashed" style="height:30%;" />
 			<li
 				aria-current={$page.url.pathname === "/documentation"
 					? "page"
 					: undefined}
 			>
-				<a href="/documentation">{$_('header.documentation')}</a>
+				<a href="/documentation">{$_("header.documentation")}</a>
 			</li>
-			<hr class="dashed" style="height:30%;"/>
+			<hr class="dashed" style="height:30%;" />
 			<li
 				aria-current={$page.url.pathname === "/about"
 					? "page"
 					: undefined}
 			>
-				<a href="/about">{$_('header.about')}</a>
+				<a href="/about">{$_("header.about")}</a>
 			</li>
 		</ul>
 		<svg viewBox="0 0 2 3" aria-hidden="true">
@@ -89,6 +113,10 @@
 			<img src={github} alt="GitHub" />
 		</a>
 	</div>
+	<Button class="fixed right-6 bottom-6" pill={true} color="yellow">
+		{memory}</Button
+	>
+	<Tooltip>{$_("header.ram_usage")}</Tooltip>
 </header>
 
 <style>
@@ -179,5 +207,4 @@
 	a:hover {
 		color: var(--color-theme-1);
 	}
-	
 </style>

@@ -34,8 +34,8 @@
 
 	import { Check, Cross2 } from "radix-icons-svelte";
 	import DataTable, { Head, Body, Row, Cell } from "@smui/data-table";
-	import {Select} from "flowbite-svelte";
-	import { _ } from 'svelte-i18n'
+	import { Select } from "flowbite-svelte";
+	import { _ } from "svelte-i18n";
 	/**
 	 * @type {String}
 	 */
@@ -49,7 +49,7 @@
 	onMount(async () => {
 		if (!$running_analysis) {
 			previous_analysis.set(false);
-			status_fails.set(false)
+			status_fails.set(false);
 			step_running.set(-1);
 			beggining_datetime.set(new Date());
 			map_datetime.set(new Date());
@@ -60,24 +60,25 @@
 		const response = await fetch("/api/projects");
 		const data = await response.json();
 		apiData.set(data);
-		if($listProjects.length == 1){
-			selectedOption = $listProjects[0].value
-			ProjectInfoSelected = $ProjectsInfo[selectedOption]["uuid"]
+		if ($listProjects.length == 1) {
+			selectedOption = $listProjects[0].value;
+			ProjectInfoSelected = $ProjectsInfo[selectedOption]["uuid"];
 		}
-
 	});
 
 	async function mapData() {
-		
 		beggining_datetime.set(new Date());
 		const formData = new FormData();
 		for (const file of files) {
 			formData.append("files", file, file.name);
 		}
-		const res = await fetch(`/api/uploadfiles/${ProjectInfoSelected}`, {
-			method: "POST",
-			body: formData,
-		});
+		const res = await fetch(
+			`/api/uploadfiles/${ProjectInfoSelected}`,
+			{
+				method: "POST",
+				body: formData,
+			},
+		);
 		const res_json = await res.json();
 
 		map_datetime.set(new Date());
@@ -92,13 +93,15 @@
 	}
 
 	async function doChecking() {
-		const res = await fetch(`/api/checking/${ProjectInfoSelected}`);
+		const res = await fetch(
+			`/api/checking/${ProjectInfoSelected}`,
+		);
 		const res_json = await res.json();
 
 		checking_datetime.set(new Date());
 		dqa_datetime.set(new Date());
 		step_running.set(1);
-		if (res.ok) {			
+		if (res.ok) {
 			return res_json["output"];
 		} else {
 			status_fails.set(true);
@@ -108,10 +111,12 @@
 	}
 
 	async function doDQA() {
-		const res = await fetch(`/api/dqa/${ProjectInfoSelected}`);
+		const res = await fetch(
+			`/api/dqa/${ProjectInfoSelected}`,
+		);
 		const res_json = await res.json();
 		dqa_datetime.set(new Date());
-		step_running.set(2);
+		step_running.set(3);
 		if (res.ok) {
 			return res_json["output"];
 		} else {
@@ -122,10 +127,12 @@
 	}
 
 	async function doValidator() {
-		const res = await fetch(`/api/validator/${ProjectInfoSelected}`);
+		const res = await fetch(
+			`/api/validator/${ProjectInfoSelected}`,
+		);
 		const res_json = await res.json();
 		validator_datetime.set(new Date());
-		step_running.set(3);
+		step_running.set(2);
 		if (res.ok) {
 			return res_json["output"];
 		} else {
@@ -154,7 +161,7 @@
 	async function upload() {
 		running_analysis.set(true);
 		previous_analysis.set(true);
-		status_fails.set(false)
+		status_fails.set(false);
 		promise_upload_file.set(mapData());
 		await $promise_upload_file;
 		newNotification.set(true);
@@ -163,12 +170,16 @@
 			await $promise_check_sintax;
 		}
 		if ($running_analysis) {
-			promise_dqa.set(doDQA());
-			await $promise_dqa;
-		}
-		if ($running_analysis) {
+			//promise_dqa.set(doDQA());
+			//await $promise_dqa;
 			promise_validator.set(doValidator());
 			await $promise_validator;
+		}
+		if ($running_analysis) {
+			//promise_validator.set(doValidator());
+			//await $promise_validator;
+			promise_dqa.set(doDQA());
+			await $promise_dqa;
 		}
 		step_running.set(4);
 		running_analysis.set(false);
@@ -189,26 +200,27 @@
 	<meta name="Map your data" content="Map data" />
 </svelte:head>
 
-<h1>{$_('mapdata.title')}</h1>
+<h1>{$_("mapdata.title")}</h1>
 <Space h="xl" />
 <p>
-	{$_('mapdata.explanation_1')}
+	{$_("mapdata.explanation_1")}
 </p>
 <Space h="xl" />
 <Select
 	bind:value={selectedOption}
 	items={$listProjects}
-	placeholder="{$_('mapdata.default_selection')}"
+	placeholder={$_("mapdata.default_selection")}
 	label="Select a project"
-	on:change={() => (ProjectInfoSelected = $ProjectsInfo[selectedOption]["uuid"])}
+	on:change={() =>
+		(ProjectInfoSelected = $ProjectsInfo[selectedOption]["uuid"])}
 />
 <Space h="xl" />
 <p>
-	{$_('mapdata.explanation_2')}
+	{$_("mapdata.explanation_2")}
 </p>
 <Space h="xl" />
 <Button color="dark" radius="lg" size="md" on:click={uploadFileClick}
-	>{$_('mapdata.button_files')}</Button
+	>{$_("mapdata.button_files")}</Button
 >
 <input
 	id="file-to-upload"
@@ -220,7 +232,7 @@
 />
 {#if files && files["length"] > 0}
 	<Divider
-		label="{$_('mapdata.csv_selected')}"
+		label={$_("mapdata.csv_selected")}
 		labelPosition="center"
 		variant="dashed"
 	/>
@@ -228,10 +240,14 @@
 		<DataTable table$aria-label="db info" style="max-width: 100%;">
 			<Head>
 				<Row>
-					<Cell style="text-align: left;">{$_('mapdata.file_name')}</Cell>
+					<Cell style="text-align: left;"
+						>{$_("mapdata.file_name")}</Cell
+					>
 					<Space w="xl" />
 					<Space w="xl" />
-					<Cell style="text-align: center;">{$_('mapdata.file_size')}</Cell>
+					<Cell style="text-align: center;"
+						>{$_("mapdata.file_size")}</Cell
+					>
 				</Row>
 			</Head>
 			<Body>
@@ -261,7 +277,7 @@
 		$running_analysis}
 	on:click={upload}
 >
-{$_('mapdata.button_mapping')}
+	{$_("mapdata.button_mapping")}
 </Button>
 
 <Space h="xl" />
@@ -274,57 +290,64 @@
 	lineWidth={4}
 	bulletSize={20}
 >
-	<Timeline.Item title="{$_('mapdata.step_mapping')}" bullet={Status}>
+	<Timeline.Item title={$_("mapdata.step_mapping")} bullet={Status}>
 		<Text size="xs"
 			>{#if $step_running >= 0}
 				{secondsDiff($map_datetime, $beggining_datetime)}
 			{:else}
 				0
-			{/if} {$_('mapdata.seconds')}</Text
+			{/if}
+			{$_("mapdata.seconds")}</Text
 		>
 	</Timeline.Item>
-	<Timeline.Item title="{$_('mapdata.step_checking')}" bullet={Status}>
+	<Timeline.Item title={$_("mapdata.step_checking")} bullet={Status}>
 		<Text size="xs"
 			>{#if $step_running >= 1}{secondsDiff(
 					$checking_datetime,
-					$map_datetime
+					$map_datetime,
 				)}{:else}
 				0
-			{/if} {$_('mapdata.seconds')}</Text
-		>
-	</Timeline.Item>
-
-	<Timeline.Item title="{$_('mapdata.step_launching_data_quality')}" bullet={Status}>
-		<Text size="xs"
-			>{#if $step_running >= 2}{secondsDiff(
-					$dqa_datetime,
-					$checking_datetime
-				)}{:else}
-				0
-			{/if} {$_('mapdata.seconds')}</Text
+			{/if}
+			{$_("mapdata.seconds")}</Text
 		>
 	</Timeline.Item>
 
 	<Timeline.Item
-		title="{$_('mapdata.step_checking_rules')}"
+		title={$_("mapdata.step_checking_rules")}
 		lineVariant="dashed"
 		bullet={Status}
 	>
 		<Text size="xs"
 			>{#if $step_running >= 3}{secondsDiff(
 					$validator_datetime,
-					$dqa_datetime
+					$dqa_datetime,
 				)}{:else}
 				0
-			{/if} {$_('mapdata.seconds')}</Text
+			{/if}
+			{$_("mapdata.seconds")}</Text
 		>
 	</Timeline.Item>
 
-	<Timeline.Item title="{$_('mapdata.step_allset')}" />
+	<Timeline.Item
+		title={$_("mapdata.step_launching_data_quality")}
+		bullet={Status}
+	>
+		<Text size="xs"
+			>{#if $step_running >= 2}{secondsDiff(
+					$dqa_datetime,
+					$checking_datetime,
+				)}{:else}
+				0
+			{/if}
+			{$_("mapdata.seconds")}</Text
+		>
+	</Timeline.Item>
+
+	<Timeline.Item title={$_("mapdata.step_allset")} />
 	<Space h="xl" />
 	<Space h="xl" />
 	<Button color="dark" disabled={$step_running < 3} on:click={goDownloads}
-		>{$_('mapdata.button_download')}</Button
+		>{$_("mapdata.button_download")}</Button
 	>
 	<Space h="xl" />
 	<Space h="xl" />
@@ -332,17 +355,17 @@
 		{#await $promise_upload_file}
 			<!-- promise is pending -->
 			<Notification
-				title="{$_('mapdata.notification_1_title_1')}"
+				title={$_("mapdata.notification_1_title_1")}
 				loading
 				withCloseButton={false}
 			>
-			{$_('mapdata.notification_1_text_1')}
+				{$_("mapdata.notification_1_text_1")}
 			</Notification>
 			<Space h="xl" />
 		{:then value}
 			<!-- promise was fulfilled -->
 			<Notification
-				title='{$_('mapdata.notification_1_title_2')}'
+				title={$_("mapdata.notification_1_title_2")}
 				icon={Check}
 				color="teal"
 				withCloseButton={false}
@@ -375,17 +398,17 @@
 		{#await $promise_check_sintax}
 			<!-- promise is pending -->
 			<Notification
-				title="{$_('mapdata.notification_2_title_1')}"
+				title={$_("mapdata.notification_2_title_1")}
 				loading
 				withCloseButton={false}
 			>
-			{$_('mapdata.notification_2_text_1')}
+				{$_("mapdata.notification_2_text_1")}
 			</Notification>
 			<Space h="xl" />
 		{:then value}
 			<!-- promise was fulfilled -->
 			<Notification
-				title='{$_('mapdata.notification_2_title_2')}'
+				title={$_("mapdata.notification_2_title_2")}
 				icon={Check}
 				color="teal"
 				withCloseButton={false}
@@ -420,20 +443,20 @@
 		{/await}
 	{/if}
 	{#if ($running_analysis || $previous_analysis) && $step_running >= 1}
-		{#await $promise_dqa}
+		{#await $promise_validator}
 			<!-- promise is pending -->
 			<Notification
-				title="{$_('mapdata.notification_3_title_1')}"
+				title={$_("mapdata.notification_4_title_1")}
 				loading
 				withCloseButton={false}
 			>
-			{$_('mapdata.notification_3_text_1')}
+				{$_("mapdata.notification_4_text_1")}
 			</Notification>
 			<Space h="xl" />
 		{:then value}
 			<!-- promise was fulfilled -->
 			<Notification
-				title='{$_('mapdata.notification_3_title_2')}'
+				title={$_("mapdata.notification_4_title_2")}
 				icon={Check}
 				color="teal"
 				withCloseButton={false}
@@ -468,20 +491,20 @@
 		{/await}
 	{/if}
 	{#if ($running_analysis || $previous_analysis) && $step_running >= 2}
-		{#await $promise_validator}
+		{#await $promise_dqa}
 			<!-- promise is pending -->
 			<Notification
-				title="{$_('mapdata.notification_4_title_1')}"
+				title={$_("mapdata.notification_3_title_1")}
 				loading
 				withCloseButton={false}
 			>
-			{$_('mapdata.notification_4_text_1')}
+				{$_("mapdata.notification_3_text_1")}
 			</Notification>
 			<Space h="xl" />
 		{:then value}
 			<!-- promise was fulfilled -->
 			<Notification
-				title='{$_('mapdata.notification_4_title_2')}'
+				title={$_("mapdata.notification_3_title_2")}
 				icon={Check}
 				color="teal"
 				withCloseButton={false}

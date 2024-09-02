@@ -35,9 +35,15 @@
 	});
 
 	let active = 0
-
+	let color_ = "yellow"
 	setInterval(() => {
 		active = (active + 1) % 3
+		if(active==2){
+			color_ = "green"
+		}
+		else{
+			color_ = "yellow"
+		}
 	}, 1500);
 
 	import { blur } from 'svelte/transition'; 
@@ -84,7 +90,7 @@
 <Space h="xs" />
 
 <Center>
-	<Timeline color="yellow" active={active} lineWidth={4} bulletSize={20}>
+	<Timeline color={color_} active={active} lineWidth={4} bulletSize={20}>
 		<Timeline.Item title="{$_('home.map_data_title')}">
 			<Text color="dimmed" size="sm"
 				>{$_('home.map_data_text')}</Text

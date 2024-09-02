@@ -1,4 +1,4 @@
-FROM node:16.20.0-alpine3.17 AS ui_development
+FROM node:22-alpine AS ui_development
 WORKDIR /usr/src/app
 COPY gui_aspire ./
 RUN npm install
@@ -16,7 +16,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     gdebi-core \
     && rm -rf /var/lib/apt/lists/*
 
-ARG QUARTO_VERSION="1.2.475"
+ARG QUARTO_VERSION="1.5.57"
 RUN curl -o quarto-linux-amd64.deb -L https://github.com/quarto-dev/quarto-cli/releases/download/v${QUARTO_VERSION}/quarto-${QUARTO_VERSION}-linux-amd64.deb \
     && gdebi --non-interactive quarto-linux-amd64.deb \
     && rm quarto-linux-amd64.deb \

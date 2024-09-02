@@ -5,7 +5,8 @@
     "runanalysis": "Run analysis",
     "outputs": "Outputs",
     "documentation": "Documentation",
-    "about": "About"
+    "about": "About",
+    "ram_usage":"RAM Usage"
   },
   "footer": {
     "about": "About",

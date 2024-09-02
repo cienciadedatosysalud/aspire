@@ -16,7 +16,7 @@ import duckdb
 from starlette.staticfiles import StaticFiles
 from fastapi.responses import StreamingResponse, RedirectResponse
 from starlette.exceptions import HTTPException as StarletteHTTPException
-
+import psutil
 import zipfile
 from io import BytesIO
 
@@ -32,8 +32,9 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+
 def get_project_path_by_uuid(uuid: str):
-    project_path = os.path.join(os.path.dirname(os.path.realpath(__file__)),"projects")
+    project_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), "projects")
     conf_files_path = glob.glob(project_path + "/**/docs/CDM/cdmb_config.json", recursive=True)
     response = None
     for conf_file_path in conf_files_path:
@@ -45,9 +46,9 @@ def get_project_path_by_uuid(uuid: str):
     return response
 
 
-def get_hashed_files_list(ts, path,process):
+def get_hashed_files_list(ts, path, process):
     output_path = os.path.join(path, 'outputs')
-    path +="/"
+    path += "/"
     files_to_has = glob.glob(path + '**', recursive=True)
     hash_file = {"files": []}
     for filename in files_to_has:
@@ -65,7 +66,7 @@ def get_hashed_files_list(ts, path,process):
                         }
                     )
 
-    with open(os.path.join(output_path,'hashed_files_list_'+process+'_process.json'), 'w') as outfile:
+    with open(os.path.join(output_path, 'hashed_files_list_' + process + '_process.json'), 'w') as outfile:
         json_object = json.dumps(hash_file, indent=4)
         outfile.write(json_object)
 
@@ -86,7 +87,7 @@ def delete_input_directory(file_paths_):
 
 @app.get("/api/projects")
 def get_projects():
-    project_path = os.path.join(os.path.dirname(os.path.realpath(__file__)),"projects")
+    project_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), "projects")
     conf_files_path = glob.glob(project_path + "/**/docs/CDM/cdmb_config.json", recursive=True)
     response = []
     for conf_file_path in conf_files_path:
@@ -128,14 +129,14 @@ def get_projects_db(project_id: str):
                 df_count = con.query(query).to_df()
                 result = df_count.to_dict(orient="records")
             except Exception:
-                result = [{"entity":"-", "n_registries":"-"}]
+                result = [{"entity": "-", "n_registries": "-"}]
                 return result
     return result
 
 
 @app.get("/api/results")
 def get_results():
-    project_path = os.path.join(os.path.dirname(os.path.realpath(__file__)),"projects")
+    project_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), "projects")
     outputs_files = list(filter(os.path.isfile, glob.glob(project_path + "/**/outputs/**", recursive=True)))
     outputs_files.sort(key=os.path.getctime, reverse=True)
     response_files = []
@@ -176,6 +177,17 @@ def get_results():
     return {"projects": response_projects, "files": response_files}
 
 
+# Get RAM usage
+@app.get("/api/memoryusage")
+def get_memory_usage():
+    try:
+        mem_info = psutil.virtual_memory()
+        memory = f"~ {(mem_info.total - mem_info.available) / (1024 ** 3):.2f}/{mem_info.total / (1024 ** 3):.2f} GB"
+        return memory
+    except:
+        return "NA"
+
+
 # Launch DQA
 @app.get("/api/dqa/{project_id}")
 def launch_dqa(project_id: str):
@@ -205,9 +217,9 @@ def launch_dqa(project_id: str):
     with open(log_path, 'w') as f:
         f.write(output)
 
-    get_hashed_files_list(ts_script, path,'dqa')
+    get_hashed_files_list(ts_script, path, 'dqa')
     if process.returncode != 0:
-            raise HTTPException(status_code=400, detail=output)
+        raise HTTPException(status_code=400, detail=output)
     return {"status_code": process.returncode, "output": output}
 
 
@@ -242,9 +254,9 @@ def launch_checking(project_id: str):
         os.remove(log_path)
     with open(log_path, 'w') as f:
         f.write(output)
-    get_hashed_files_list(ts_script, path,'check_load')
+    get_hashed_files_list(ts_script, path, 'check_load')
     if process.returncode != 0:
-            raise HTTPException(status_code=400, detail=output)
+        raise HTTPException(status_code=400, detail=output)
     return {"status_code": process.returncode, "output": output}
 
 
@@ -281,7 +293,7 @@ def launch_validator(project_id: str):
         if not isExisting:
             raise HTTPException(status_code=400, detail='Cannot find validator_report.qmd in your project')
         process_report = subprocess.Popen(["quarto", "render", validator_report_path, "--output-dir", "../../outputs"],
-                                        stdout=subprocess.PIPE, stderr=subprocess.STDOUT, universal_newlines=True)
+                                          stdout=subprocess.PIPE, stderr=subprocess.STDOUT, universal_newlines=True)
         output_report, error = process_report.communicate()
         process_report.wait()
         output_report = output_report.replace("\x1b[39m", "")
@@ -296,33 +308,32 @@ def launch_validator(project_id: str):
             f.write(output_report)
         output += "\n Launching report: \n\n"
         output += output_report
-    get_hashed_files_list(ts_script, path,'validator')
+    get_hashed_files_list(ts_script, path, 'validator')
     if process.returncode != 0:
         raise HTTPException(status_code=400, detail=output)
     return {"status_code": process.returncode, "output": output}
 
 
-def get_installed_libraries(output_path:str, cdmb_config_path:str):
-
-    script_version= f"""
+def get_installed_libraries(output_path: str, cdmb_config_path: str):
+    script_version = f"""
     #!/bin/bash
     cdmb_version=$(cat {cdmb_config_path} | grep -E 'cdmb_version' | tr -d ' ",' | cut -d ':' -f 2)
     echo "CDMB version: $cdmb_version" > "{output_path}/sys_info.log"
     echo "ASPIRE version: $ASPIRE_VERSION" >> "{output_path}/sys_info.log"
     echo "Pipeline version: $PIPELINE_VERSION \n" >> "{output_path}/sys_info.log"
     """
-    process = subprocess.Popen(script_version,shell=True,
-                                   stdout=subprocess.PIPE, stderr=subprocess.STDOUT, universal_newlines=True)
+    process = subprocess.Popen(script_version, shell=True,
+                               stdout=subprocess.PIPE, stderr=subprocess.STDOUT, universal_newlines=True)
     output, error = process.communicate()
     process.wait()
 
-    script_memory= f"""
+    script_memory = f"""
     #!/bin/bash
     output=$(cat /proc/meminfo | grep -E 'MemTotal|MemFree|MemAvailable')
     echo "$output \n" >> "{output_path}/sys_info.log"
     """
-    process = subprocess.Popen(script_memory,shell=True,
-                                   stdout=subprocess.PIPE, stderr=subprocess.STDOUT, universal_newlines=True)
+    process = subprocess.Popen(script_memory, shell=True,
+                               stdout=subprocess.PIPE, stderr=subprocess.STDOUT, universal_newlines=True)
     output, error = process.communicate()
     process.wait()
     script_libraries = f"""
@@ -330,10 +341,11 @@ def get_installed_libraries(output_path:str, cdmb_config_path:str):
     output=$(micromamba -n aspire list)
     echo "$output" >> "{output_path}/sys_info.log"
     """
-    process = subprocess.Popen(script_libraries,shell=True,
-                                   stdout=subprocess.PIPE, stderr=subprocess.STDOUT, universal_newlines=True)
+    process = subprocess.Popen(script_libraries, shell=True,
+                               stdout=subprocess.PIPE, stderr=subprocess.STDOUT, universal_newlines=True)
     output, error = process.communicate()
     process.wait()
+
 
 # Launch analysis
 @app.get("/api/analysis/{project_id}/{script_name}")
@@ -366,7 +378,7 @@ def launch_analysis(project_id: str, script_name: str):
             os.remove(log_path)
         with open(log_path, 'w') as f:
             f.write(output)
-        get_hashed_files_list(ts_script, path,'analysis')
+        get_hashed_files_list(ts_script, path, 'analysis')
         if process.returncode != 0:
             raise HTTPException(status_code=400, detail=output)
         return {"status_code": process.returncode, "output": output}
@@ -386,7 +398,7 @@ def launch_analysis(project_id: str, script_name: str):
             os.remove(log_path)
         with open(log_path, 'w') as f:
             f.write(output)
-        get_hashed_files_list(ts_script, path,'analysis')
+        get_hashed_files_list(ts_script, path, 'analysis')
         if process.returncode != 0:
             raise HTTPException(status_code=400, detail=output)
         return {"status_code": process.returncode, "output": output}
@@ -413,12 +425,13 @@ def launch_analysis(project_id: str, script_name: str):
             os.remove(log_path)
         with open(log_path, 'w') as f:
             f.write(output)
-        get_hashed_files_list(ts_script, path,'analysis')
+        get_hashed_files_list(ts_script, path, 'analysis')
         if process.returncode != 0:
             raise HTTPException(status_code=400, detail=output)
         return {"status_code": process.returncode, "output": output}
     else:
-        raise HTTPException(status_code=400, detail="Script with invalid extension. Only .py, .R , .qmd (Python or R) are supported.")
+        raise HTTPException(status_code=400,
+                            detail="Script with invalid extension. Only .py, .R , .qmd (Python or R) are supported.")
 
 
 # Launch analysis
@@ -435,15 +448,17 @@ def get_analysis_scripts():
         response["scripts"].append({"uuid": uuid, "files": text_files})
     return response
 
+
 # Download all files
 @app.get("/api/download/{project_id}")
 def download_all(project_id: str):
     try:
         path_ = get_project_path_by_uuid(project_id)
-        outputs_files = list(filter(os.path.isfile,glob.glob(os.path.join(path_ + "/outputs/**"), recursive=True)))
+        outputs_files = list(filter(os.path.isfile, glob.glob(os.path.join(path_ + "/outputs/**"), recursive=True)))
         return zipfiles(outputs_files)
     except:
         raise HTTPException(status_code=400, detail=f'Something went wrong trying to download all the files.')
+
 
 # Download file
 @app.get("/api/download/{project_id}/{filename}")
@@ -471,7 +486,7 @@ def zipfiles(file_list):
     io = BytesIO()
     with zipfile.ZipFile(io, mode='w', compression=zipfile.ZIP_DEFLATED) as zip:
         for fpath in file_list:
-            zip.write(fpath,arcname=str(fpath).split('projects/')[1])
+            zip.write(fpath, arcname=str(fpath).split('projects/')[1])
         zip.close()
     return StreamingResponse(
         iter([io.getvalue()]),
@@ -532,7 +547,8 @@ async def delete_outputs_files(project_id: str):
     return {"status_code": status, "output": output}
 
 
-app.mount("/", StaticFiles(directory=os.path.join(os.path.dirname(os.path.realpath(__file__)),"front"), html=True), name="front")
+app.mount("/", StaticFiles(directory=os.path.join(os.path.dirname(os.path.realpath(__file__)), "front"), html=True),
+          name="front")
 
 
 @app.exception_handler(StarletteHTTPException)
@@ -541,6 +557,7 @@ async def custom_http_exception_handler(request, exc):
         return RedirectResponse("/")
     else:
         return JSONResponse({"detail": str(exc.detail)}, status_code=exc.status_code)
+
 
 if __name__ == "__main__":
     port = os.getenv('APP_PORT') if os.getenv('APP_PORT') else 3000
